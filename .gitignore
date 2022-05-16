@@ -1,6 +1,7 @@
 lib
 backup
 project1
+databases
 *.xml
 *.res
 *.lps
