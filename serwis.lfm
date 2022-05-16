@@ -1,0 +1,61 @@
+object dm: Tdm
+  OldCreateOrder = False
+  Height = 293
+  HorizontalOffset = 2313
+  VerticalOffset = 707
+  Width = 379
+  object db: TZConnection
+    ControlsCodePage = cCP_UTF8
+    AutoEncodeStrings = True
+    ClientCodepage = 'utf8mb4'
+    Catalog = 'biblia'
+    Properties.Strings = (
+      'codepage=utf8mb4'
+      'AutoEncodeStrings=ON'
+    )
+    HostName = 'localhost'
+    Port = 0
+    Database = 'biblia'
+    User = 'tao'
+    Password = 'nahalia'
+    Protocol = 'sqlite-3'
+    Left = 32
+    Top = 20
+  end
+  object trans: TZTransaction
+    Database = db
+    Left = 80
+    Top = 20
+  end
+  object list_tables: TZQuery
+    Connection = db
+    SQL.Strings = (
+      'show tables;'
+    )
+    Params = <>
+    Left = 32
+    Top = 80
+  end
+  object list_views: TZQuery
+    Connection = db
+    SQL.Strings = (
+      'SELECT TABLE_NAME FROM information_schema.tables'
+      'WHERE TABLE_SCHEMA=:db'
+      'AND TABLE_TYPE LIKE ''VIEW'';'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'db'
+        ParamType = ptUnknown
+      end>
+    Left = 32
+    Top = 136
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'db'
+        ParamType = ptUnknown
+      end>
+  end
+end

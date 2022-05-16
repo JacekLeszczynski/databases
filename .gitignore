@@ -1,0 +1,6 @@
+lib
+backup
+project1
+*.xml
+*.res
+*.lps

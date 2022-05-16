@@ -1,0 +1,195 @@
+object FEditDB: TFEditDB
+  Left = 396
+  Height = 320
+  Top = 133
+  Width = 456
+  Caption = 'Dodanie/Edycja Bazy Danych'
+  ClientHeight = 320
+  ClientWidth = 456
+  LCLVersion = '2.0.12.0'
+  object Label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 8
+    Height = 17
+    Top = 8
+    Width = 35
+    BorderSpacing.Left = 8
+    BorderSpacing.Top = 8
+    Caption = 'Host:'
+    ParentColor = False
+  end
+  object Edit1: TEdit
+    AnchorSideLeft.Control = Label1
+    AnchorSideTop.Control = Label1
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 30
+    Top = 25
+    Width = 440
+    TabOrder = 0
+  end
+  object Label2: TLabel
+    AnchorSideLeft.Control = SpinEdit1
+    AnchorSideTop.Control = SpinEdit1
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 17
+    Top = 160
+    Width = 85
+    BorderSpacing.Top = 4
+    Caption = 'Baza danych:'
+    ParentColor = False
+  end
+  object Edit2: TEdit
+    AnchorSideLeft.Control = Label2
+    AnchorSideTop.Control = Label2
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 30
+    Top = 177
+    Width = 192
+    TabOrder = 3
+  end
+  object Label3: TLabel
+    AnchorSideLeft.Control = Edit1
+    AnchorSideTop.Control = ComboBox1
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 17
+    Top = 109
+    Width = 32
+    BorderSpacing.Top = 4
+    Caption = 'Port:'
+    ParentColor = False
+  end
+  object SpinEdit1: TSpinEdit
+    AnchorSideLeft.Control = Label3
+    AnchorSideTop.Control = Label3
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 30
+    Top = 126
+    Width = 118
+    MaxValue = 65535
+    TabOrder = 2
+  end
+  object Label4: TLabel
+    AnchorSideLeft.Control = SpinEdit1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = SpinEdit1
+    AnchorSideTop.Side = asrCenter
+    Left = 130
+    Height = 17
+    Top = 133
+    Width = 179
+    BorderSpacing.Left = 4
+    Caption = '(wartość 0 = port domyślny)'
+    ParentColor = False
+  end
+  object Label5: TLabel
+    AnchorSideLeft.Control = SpinEdit1
+    AnchorSideTop.Control = Edit2
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 17
+    Top = 211
+    Width = 78
+    BorderSpacing.Top = 4
+    Caption = 'Użytkownik:'
+    ParentColor = False
+  end
+  object Edit3: TEdit
+    AnchorSideLeft.Control = Label5
+    AnchorSideTop.Control = Label5
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 30
+    Top = 228
+    Width = 192
+    TabOrder = 4
+  end
+  object Label6: TLabel
+    AnchorSideLeft.Control = SpinEdit1
+    AnchorSideTop.Control = Edit3
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 17
+    Top = 262
+    Width = 43
+    BorderSpacing.Top = 4
+    Caption = 'Hasło:'
+    ParentColor = False
+  end
+  object Edit4: TEdit
+    AnchorSideLeft.Control = Label6
+    AnchorSideTop.Control = Label6
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 30
+    Top = 279
+    Width = 192
+    EchoMode = emPassword
+    PasswordChar = '*'
+    TabOrder = 5
+  end
+  object BitBtn1: TBitBtn
+    AnchorSideTop.Control = BitBtn2
+    AnchorSideRight.Control = BitBtn2
+    Left = 294
+    Height = 30
+    Top = 282
+    Width = 75
+    Anchors = [akTop, akRight]
+    BorderSpacing.Right = 4
+    Caption = 'OK'
+    OnClick = BitBtn1Click
+    TabOrder = 6
+  end
+  object BitBtn2: TBitBtn
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 373
+    Height = 30
+    Top = 282
+    Width = 75
+    Anchors = [akRight, akBottom]
+    BorderSpacing.Right = 8
+    BorderSpacing.Bottom = 8
+    Caption = 'Anuluj'
+    OnClick = BitBtn2Click
+    TabOrder = 7
+  end
+  object ComboBox1: TComboBox
+    AnchorSideLeft.Control = Label7
+    AnchorSideTop.Control = Label7
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 29
+    Top = 76
+    Width = 192
+    ItemHeight = 0
+    Items.Strings = (
+      'SQLite ver. 3'
+      'MySQL'
+      'Maria DB v.5'
+      'Maria DB v.10'
+    )
+    Style = csDropDownList
+    TabOrder = 1
+  end
+  object Label7: TLabel
+    AnchorSideLeft.Control = Edit1
+    AnchorSideTop.Control = Edit1
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 17
+    Top = 59
+    Width = 60
+    BorderSpacing.Top = 4
+    Caption = 'Protokół:'
+    ParentColor = False
+  end
+end
