@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 2071
+  Left = 2182
   Height = 823
-  Top = 92
+  Top = 140
   Width = 1365
   Caption = 'Databases'
   ClientHeight = 823
@@ -242,6 +242,13 @@ object Form1: TForm1
     object MenuItem3: TMenuItem
       Caption = 'Usuń bazę danych'
     end
+    object MenuItem25: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem26: TMenuItem
+      Caption = 'Wygeneruj wzorzec bazy danych'
+      OnClick = MenuItem26Click
+    end
   end
   object PopupMenu2: TPopupMenu
     Left = 56
@@ -400,5 +407,9 @@ object Form1: TForm1
       Caption = 'Edytor SQL'
       OnClick = _EDYTOR_SQL
     end
+  end
+  object schema: TDBSchemaSync
+    Left = 159
+    Top = 127
   end
 end

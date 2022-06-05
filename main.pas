@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
   ExtCtrls, Buttons, Menus, DBGrids, VirtualTrees,
-  ZTransaction, ExtMessage, db, memds, contNrs,
+  ZTransaction, ExtMessage, DBSchemaSync, db, memds, contNrs,
   ZConnection, ZDataset, ZSqlProcessor, Types, LCLType, XMLPropStorage;
 
 type
@@ -20,6 +20,7 @@ type
     data: string;
     db: TZConnection;
     trans: TZTransaction;
+    schemaFile: string;
   end;
 
   TIdx = record
@@ -30,6 +31,7 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    schema: TDBSchemaSync;
     im_menu: TImageList;
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
@@ -46,6 +48,8 @@ type
     MenuItem22: TMenuItem;
     MenuItem23: TMenuItem;
     MenuItem24: TMenuItem;
+    MenuItem25: TMenuItem;
+    MenuItem26: TMenuItem;
     mess: TExtMessage;
     im_button: TImageList;
     MenuItem1: TMenuItem;
@@ -79,6 +83,7 @@ type
     procedure MenuItem16Click(Sender: TObject);
     procedure MenuItem19Click(Sender: TObject);
     procedure MenuItem22Click(Sender: TObject);
+    procedure MenuItem26Click(Sender: TObject);
     procedure _EDYTOR_SQL(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
@@ -280,6 +285,26 @@ begin
   end;
 end;
 
+procedure TForm1.MenuItem26Click(Sender: TObject);
+var
+  data: PTreeData;
+  s: string;
+begin
+  Data:=vst.GetNodeData(vst.HotNode);
+  if data^.rodzic and data^.bold then
+  begin
+    s:=trim(GetLineToStr(Data^.data,7,','));
+    if s='' then mess.ShowInformation('Najpierw wypełnij pole wzorca w konfiguracji bazy.') else
+    begin
+      schema.DB_Connection:=data^.db;
+      schema.StructFileName:=s;
+      schema.init;
+      schema.SaveSchema;
+      mess.ShowInformation('Wzorzec bazy wykonany.');
+    end;
+  end else mess.ShowInformation('Baza danych musi być otwarta.');
+end;
+
 procedure TForm1._EDYTOR_SQL(Sender: TObject);
 var
   t: TTabSheet;
@@ -321,6 +346,7 @@ var
   port: word;
   ok: boolean;
   s,s2: string;
+  sfile: string;
 begin
   FEditDB:=TFEditDB.Create(self);
   try
@@ -339,6 +365,7 @@ begin
       database:=FEditDB.Edit2.Text;
       user:=FEditDB.Edit3.Text;
       passw:=FEditDB.Edit4.Text;
+      sfile:=FEditDB.FileNameEdit1.FileName;
     end;
   finally
     FEditDB.Free;
@@ -346,7 +373,7 @@ begin
   if ok then
   begin
     s:=protokol+','+host+':'+IntToStr(port)+' ('+database+')';
-    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw;
+    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw+','+sfile;
     Add(s,s2);
   end;
 end;
@@ -358,6 +385,7 @@ var
   port: word;
   ok: boolean;
   s,s2: string;
+  sfile: string;
 begin
   Data:=vst.GetNodeData(vst.HotNode);
   FEditDB:=TFEditDB.Create(self);
@@ -372,6 +400,7 @@ begin
     FEditDB.Edit2.Text:=GetLineToStr(Data^.data,4,',');
     FEditDB.Edit3.Text:=GetLineToStr(Data^.data,5,',');
     FEditDB.Edit4.Text:=GetLineToStr(Data^.data,6,',');
+    FEditDB.FileNameEdit1.FileName:=GetLineToStr(Data^.data,7,',');
     FEditDB.ShowModal;
     ok:=FEditDB.io_ok;
     if ok then
@@ -387,6 +416,7 @@ begin
       database:=FEditDB.Edit2.Text;
       user:=FEditDB.Edit3.Text;
       passw:=FEditDB.Edit4.Text;
+      sfile:=FEditDB.FileNameEdit1.FileName;
     end;
   finally
     FEditDB.Free;
@@ -394,7 +424,7 @@ begin
   if ok then
   begin
     s:=protokol+','+host+':'+IntToStr(port)+' ('+database+')';
-    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw;
+    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw+','+sfile;
     Data^.nazwa:=s;
     Data^.data:=s2;
   end;

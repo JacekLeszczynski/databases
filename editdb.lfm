@@ -1,17 +1,17 @@
 object FEditDB: TFEditDB
-  Left = 396
-  Height = 320
-  Top = 133
-  Width = 456
+  Left = 2258
+  Height = 325
+  Top = 199
+  Width = 536
   Caption = 'Dodanie/Edycja Bazy Danych'
-  ClientHeight = 320
-  ClientWidth = 456
+  ClientHeight = 325
+  ClientWidth = 536
   LCLVersion = '2.0.12.0'
   object Label1: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
     Left = 8
-    Height = 17
+    Height = 19
     Top = 8
     Width = 35
     BorderSpacing.Left = 8
@@ -23,19 +23,23 @@ object FEditDB: TFEditDB
     AnchorSideLeft.Control = Label1
     AnchorSideTop.Control = Label1
     AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
     Left = 8
-    Height = 30
-    Top = 25
-    Width = 440
+    Height = 31
+    Top = 27
+    Width = 520
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Right = 8
     TabOrder = 0
   end
   object Label2: TLabel
-    AnchorSideLeft.Control = SpinEdit1
-    AnchorSideTop.Control = SpinEdit1
+    AnchorSideLeft.Control = ComboBox1
+    AnchorSideTop.Control = ComboBox1
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 17
-    Top = 160
+    Height = 19
+    Top = 114
     Width = 85
     BorderSpacing.Top = 4
     Caption = 'Baza danych:'
@@ -46,20 +50,20 @@ object FEditDB: TFEditDB
     AnchorSideTop.Control = Label2
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 30
-    Top = 177
+    Height = 31
+    Top = 133
     Width = 192
     TabOrder = 3
   end
   object Label3: TLabel
-    AnchorSideLeft.Control = Edit1
-    AnchorSideTop.Control = ComboBox1
-    AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 17
-    Top = 109
+    AnchorSideLeft.Control = ComboBox1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Label7
+    Left = 208
+    Height = 19
+    Top = 62
     Width = 32
-    BorderSpacing.Top = 4
+    BorderSpacing.Left = 8
     Caption = 'Port:'
     ParentColor = False
   end
@@ -67,10 +71,10 @@ object FEditDB: TFEditDB
     AnchorSideLeft.Control = Label3
     AnchorSideTop.Control = Label3
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 30
-    Top = 126
-    Width = 118
+    Left = 208
+    Height = 31
+    Top = 81
+    Width = 88
     MaxValue = 65535
     TabOrder = 2
   end
@@ -79,9 +83,9 @@ object FEditDB: TFEditDB
     AnchorSideLeft.Side = asrBottom
     AnchorSideTop.Control = SpinEdit1
     AnchorSideTop.Side = asrCenter
-    Left = 130
-    Height = 17
-    Top = 133
+    Left = 300
+    Height = 19
+    Top = 87
     Width = 179
     BorderSpacing.Left = 4
     Caption = '(wartość 0 = port domyślny)'
@@ -89,13 +93,11 @@ object FEditDB: TFEditDB
   end
   object Label5: TLabel
     AnchorSideLeft.Control = SpinEdit1
-    AnchorSideTop.Control = Edit2
-    AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 17
-    Top = 211
+    AnchorSideTop.Control = Label2
+    Left = 208
+    Height = 19
+    Top = 114
     Width = 78
-    BorderSpacing.Top = 4
     Caption = 'Użytkownik:'
     ParentColor = False
   end
@@ -103,19 +105,19 @@ object FEditDB: TFEditDB
     AnchorSideLeft.Control = Label5
     AnchorSideTop.Control = Label5
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 30
-    Top = 228
+    Left = 208
+    Height = 31
+    Top = 133
     Width = 192
     TabOrder = 4
   end
   object Label6: TLabel
-    AnchorSideLeft.Control = SpinEdit1
+    AnchorSideLeft.Control = Edit3
     AnchorSideTop.Control = Edit3
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 17
-    Top = 262
+    Left = 208
+    Height = 19
+    Top = 168
     Width = 43
     BorderSpacing.Top = 4
     Caption = 'Hasło:'
@@ -125,9 +127,9 @@ object FEditDB: TFEditDB
     AnchorSideLeft.Control = Label6
     AnchorSideTop.Control = Label6
     AnchorSideTop.Side = asrBottom
-    Left = 8
-    Height = 30
-    Top = 279
+    Left = 208
+    Height = 31
+    Top = 187
     Width = 192
     EchoMode = emPassword
     PasswordChar = '*'
@@ -136,9 +138,9 @@ object FEditDB: TFEditDB
   object BitBtn1: TBitBtn
     AnchorSideTop.Control = BitBtn2
     AnchorSideRight.Control = BitBtn2
-    Left = 294
+    Left = 374
     Height = 30
-    Top = 282
+    Top = 287
     Width = 75
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 4
@@ -151,9 +153,9 @@ object FEditDB: TFEditDB
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Left = 373
+    Left = 453
     Height = 30
-    Top = 282
+    Top = 287
     Width = 75
     Anchors = [akRight, akBottom]
     BorderSpacing.Right = 8
@@ -168,7 +170,7 @@ object FEditDB: TFEditDB
     AnchorSideTop.Side = asrBottom
     Left = 8
     Height = 29
-    Top = 76
+    Top = 81
     Width = 192
     ItemHeight = 0
     Items.Strings = (
@@ -185,11 +187,43 @@ object FEditDB: TFEditDB
     AnchorSideTop.Control = Edit1
     AnchorSideTop.Side = asrBottom
     Left = 8
-    Height = 17
-    Top = 59
+    Height = 19
+    Top = 62
     Width = 60
     BorderSpacing.Top = 4
     Caption = 'Protokół:'
     ParentColor = False
+  end
+  object Label8: TLabel
+    AnchorSideLeft.Control = Label2
+    AnchorSideTop.Control = Edit4
+    AnchorSideTop.Side = asrBottom
+    Left = 8
+    Height = 19
+    Top = 222
+    Width = 160
+    BorderSpacing.Top = 4
+    Caption = 'Plik wzorca bazy danych:'
+    ParentColor = False
+  end
+  object FileNameEdit1: TFileNameEdit
+    AnchorSideLeft.Control = Label8
+    AnchorSideTop.Control = Label8
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 8
+    Height = 31
+    Top = 222
+    Width = 520
+    FileName = 'FileNameEdit1'
+    FilterIndex = 0
+    HideDirectories = False
+    ButtonWidth = 23
+    NumGlyphs = 1
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Right = 8
+    MaxLength = 0
+    TabOrder = 8
+    Text = 'FileNameEdit1'
   end
 end

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Spin,
-  Buttons;
+  Buttons, EditBtn;
 
 type
 
@@ -20,6 +20,7 @@ type
     Edit2: TEdit;
     Edit3: TEdit;
     Edit4: TEdit;
+    FileNameEdit1: TFileNameEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -27,6 +28,7 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
+    Label8: TLabel;
     SpinEdit1: TSpinEdit;
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
