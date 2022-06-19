@@ -209,13 +209,13 @@ object FEditDB: TFEditDB
   object FileNameEdit1: TFileNameEdit
     AnchorSideLeft.Control = Label8
     AnchorSideTop.Control = Label8
+    AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 8
     Height = 31
-    Top = 222
+    Top = 241
     Width = 520
-    FileName = 'FileNameEdit1'
     FilterIndex = 0
     HideDirectories = False
     ButtonWidth = 23
@@ -224,6 +224,5 @@ object FEditDB: TFEditDB
     BorderSpacing.Right = 8
     MaxLength = 0
     TabOrder = 8
-    Text = 'FileNameEdit1'
   end
 end
