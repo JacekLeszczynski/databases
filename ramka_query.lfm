@@ -744,4 +744,11 @@ object FRamkaQuery: TFRamkaQuery
     Left = 337
     Top = 69
   end
+  object PopupMenu1: TPopupMenu
+    Left = 104
+    Top = 40
+    object MenuItem1: TMenuItem
+      Caption = 'Skopiuj do schowka'
+    end
+  end
 end

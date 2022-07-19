@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, Buttons, DBGrids,
-  DBCtrls, SynEdit, SynHighlighterSQL, ZTransaction, ExtMessage, db,
+  DBCtrls, Menus, SynEdit, SynHighlighterSQL, ZTransaction, ExtMessage, db,
   ZConnection, ZDataset, ZSqlProcessor;
 
 type
@@ -21,8 +21,10 @@ type
     ds_asql: TDataSource;
     DBGrid1: TDBGrid;
     dziennik: TListBox;
+    MenuItem1: TMenuItem;
     mess: TExtMessage;
     Panel2: TPanel;
+    PopupMenu1: TPopupMenu;
     script: TZSQLProcessor;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
@@ -45,6 +47,7 @@ type
     procedure sqlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
       );
   private
+    mem_col,mem_row: integer;
     procedure f9_open;
     procedure f9_script;
   public
@@ -56,7 +59,7 @@ type
 implementation
 
 uses
-  Types, LCLType;
+  Types, LCLType, Clipbrd;
 
 {$R *.lfm}
 

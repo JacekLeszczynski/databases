@@ -6,8 +6,8 @@ object FRamkaView: TFRamkaView
   ClientHeight = 500
   ClientWidth = 778
   TabOrder = 0
-  DesignLeft = 342
-  DesignTop = 142
+  DesignLeft = 2292
+  DesignTop = 308
   object Panel1: TPanel
     Left = 0
     Height = 32
@@ -23,8 +23,8 @@ object FRamkaView: TFRamkaView
       AnchorSideTop.Control = Panel1
       AnchorSideTop.Side = asrCenter
       Left = 8
-      Height = 17
-      Top = 8
+      Height = 19
+      Top = 7
       Width = 98
       BorderSpacing.Left = 8
       Caption = 'Nazwa widoku:'
@@ -36,7 +36,7 @@ object FRamkaView: TFRamkaView
       AnchorSideTop.Control = Label1
       AnchorSideTop.Side = asrCenter
       Left = 110
-      Height = 30
+      Height = 31
       Top = 1
       Width = 274
       BorderSpacing.Left = 4
@@ -672,27 +672,27 @@ object FRamkaView: TFRamkaView
     CommentAttri.Foreground = clBlue
     CommentAttri.Style = [fsBold, fsItalic]
     SQLDialect = sqlMySQL
-    left = 168
-    top = 128
+    Left = 168
+    Top = 128
   end
   object qdata: TZQuery
     AfterOpen = qdataAfterClose
     AfterClose = qdataAfterClose
     ReadOnly = True
     Params = <>
-    left = 272
-    top = 128
+    Left = 272
+    Top = 128
   end
   object dsqdata: TDataSource
     DataSet = qdata
-    left = 344
-    top = 128
+    Left = 344
+    Top = 128
   end
   object timer_data: TTimer
     Enabled = False
     Interval = 1
     OnTimer = timer_dataTimer
-    left = 456
-    top = 128
+    Left = 456
+    Top = 128
   end
 end

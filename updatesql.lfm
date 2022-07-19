@@ -1,12 +1,12 @@
 object FUpdateSQL: TFUpdateSQL
-  Left = 370
+  Left = 2298
   Height = 427
-  Top = 239
+  Top = 271
   Width = 754
   Caption = 'Skrypt zmian'
   ClientHeight = 427
   ClientWidth = 754
-  LCLVersion = '2.0.8.0'
+  LCLVersion = '2.0.12.0'
   object Panel1: TPanel
     Left = 0
     Height = 35
@@ -551,15 +551,15 @@ object FUpdateSQL: TFUpdateSQL
     CommentAttri.Foreground = clBlue
     CommentAttri.Style = [fsBold, fsItalic]
     SQLDialect = sqlMySQL
-    left = 112
-    top = 56
+    Left = 112
+    Top = 56
   end
   object script: TZSQLProcessor
     Params = <>
     DelimiterType = dtDelimiter
     Delimiter = ';'
-    left = 200
-    top = 56
+    Left = 200
+    Top = 56
   end
   object mess: TExtMessage
     Caption = '<Auto>'
@@ -568,7 +568,7 @@ object FUpdateSQL: TFUpdateSQL
     PosTop = 0
     PosLeft = 0
     StringToCR = '^'
-    left = 296
-    top = 56
+    Left = 296
+    Top = 56
   end
 end
