@@ -151,7 +151,7 @@ var
 implementation
 
 uses
-  ecode, serwis, editdb,
+  ecode, serwis, editdb, ZCompatibility,
   ramka_table, ramka_query, ramka_view, ramka_function, ramka_procedure;
 
 {$R *.lfm}
@@ -973,9 +973,11 @@ begin
   begin
     data^.bold:=true;
     data^.db:=TZConnection.Create(self);
+    data^.db.ControlsCodePage:=cCP_UTF8;
     data^.trans:=TZTransaction.Create(self);
     data^.trans.Database:=data^.db;
     data^.db.Protocol:=GetLineToStr(data^.data,1,',');
+    if data^.db.Protocol='sqlite-3' then data^.db.ClientCodepage:='UTF-8' else data^.db.ClientCodepage:='utf8mb4';
     data^.db.HostName:=GetLineToStr(data^.data,2,',');
     data^.db.Port:=StrToInt(GetLineToStr(data^.data,3,','));
     data^.db.Database:=GetLineToStr(data^.data,4,',');
