@@ -775,7 +775,7 @@ begin
   try
     (* tabele *)
     a:=AddDziecko('Tabele','Group');
-    q.SQL.Add('SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA=database() AND TABLE_TYPE LIKE ''BASE TABLE''');
+    q.SQL.Add('SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA=database() AND TABLE_TYPE LIKE ''BASE TABLE'' order by TABLE_NAME');
     q.Open;
     while not q.EOF do
     begin
@@ -786,7 +786,7 @@ begin
     (* widoki *)
     a:=AddDziecko('Widoki','Group');
     q.SQL.Clear;
-    q.SQL.Add('SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA=database() AND TABLE_TYPE LIKE ''VIEW''');
+    q.SQL.Add('SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA=database() AND TABLE_TYPE LIKE ''VIEW'' order by TABLE_NAME');
     q.Open;
     while not q.EOF do
     begin
