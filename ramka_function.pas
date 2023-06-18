@@ -244,6 +244,11 @@ begin //[rfReplaceAll,rfIgnoreCase]
     begin
       inc(i);
       pom2:=trim(GetLineToStr(pom,i,','));
+      if pos('NUMERIC(',pom2)>0 then
+      begin
+        inc(i);
+        pom2:=pom2+','+trim(GetLineToStr(pom,i,','));
+      end;
       if pom2='' then break;
       awejscie.Append;
       awejscie.FieldByName('nazwa').AsString:=GetLineToStr(pom2,1,' ');

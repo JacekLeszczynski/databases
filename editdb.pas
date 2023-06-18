@@ -20,6 +20,7 @@ type
     Edit2: TEdit;
     Edit3: TEdit;
     Edit4: TEdit;
+    Edit5: TEdit;
     FileNameEdit1: TFileNameEdit;
     Label1: TLabel;
     Label2: TLabel;
@@ -29,6 +30,7 @@ type
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
+    Label9: TLabel;
     SpinEdit1: TSpinEdit;
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);

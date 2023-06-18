@@ -31,6 +31,7 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    MenuItem27: TMenuItem;
     schema: TDBSchemaSync;
     im_menu: TImageList;
     MenuItem10: TMenuItem;
@@ -84,6 +85,7 @@ type
     procedure MenuItem19Click(Sender: TObject);
     procedure MenuItem22Click(Sender: TObject);
     procedure MenuItem26Click(Sender: TObject);
+    procedure MenuItem27Click(Sender: TObject);
     procedure _EDYTOR_SQL(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
@@ -152,7 +154,8 @@ implementation
 
 uses
   ecode, serwis, editdb, ZCompatibility,
-  ramka_table, ramka_query, ramka_view, ramka_function, ramka_procedure;
+  ramka_table, ramka_query, ramka_view, ramka_function, ramka_procedure,
+  ramka_exec;
 
 {$R *.lfm}
 
@@ -288,21 +291,54 @@ end;
 procedure TForm1.MenuItem26Click(Sender: TObject);
 var
   data: PTreeData;
-  s: string;
+  s,slow: string;
+  i: integer;
 begin
   Data:=vst.GetNodeData(vst.HotNode);
   if data^.rodzic and data^.bold then
   begin
     s:=trim(GetLineToStr(Data^.data,7,','));
+    slow:=trim(GetLineToStr(Data^.data,8,','));
+    slow:=StringReplace(slow,'{$1}',',',[rfReplaceAll]);
     if s='' then mess.ShowInformation('Najpierw wypełnij pole wzorca w konfiguracji bazy.') else
     begin
       schema.DB_Connection:=data^.db;
       schema.StructFileName:=s;
+      schema.DictionaryTables.Clear;
+      for i:=1 to GetLineCount(slow,',') do
+      begin
+        s:=GetLineToStr(slow,i,',');
+        if s<>'' then schema.DictionaryTables.Add(s);
+      end;
       schema.init;
       schema.SaveSchema;
       mess.ShowInformation('Wzorzec bazy wykonany.');
     end;
   end else mess.ShowInformation('Baza danych musi być otwarta.');
+end;
+
+procedure TForm1.MenuItem27Click(Sender: TObject);
+var
+  data: PTreeData;
+  nazwa: string;
+  t: TTabSheet;
+  r: TFRamkaExec;
+begin
+  data:=vst.GetNodeData(vst.FocusedNode);
+  nazwa:=data^.nazwa;
+  GetDB(vst.FocusedNode,baza_db,baza_trans);
+  t:=TabPC.AddTabSheet;
+  t.Caption:=nazwa+' (EXEC)';
+  t.Tag:=6;
+  r:=TFRamkaExec.Create(t);
+  r.Parent:=t;
+  r.Align:=alClient;
+  r.io_db:=baza_db;
+  r.io_trans:=baza_trans;
+  r.io_tablename:=nazwa;
+  TabPC.ActivePage:=t;
+  r.init;
+  r.load_function;
 end;
 
 procedure TForm1._EDYTOR_SQL(Sender: TObject);
@@ -346,7 +382,7 @@ var
   port: word;
   ok: boolean;
   s,s2: string;
-  sfile: string;
+  sfile,slow: string;
 begin
   FEditDB:=TFEditDB.Create(self);
   try
@@ -366,6 +402,8 @@ begin
       user:=FEditDB.Edit3.Text;
       passw:=FEditDB.Edit4.Text;
       sfile:=FEditDB.FileNameEdit1.FileName;
+      slow:=FEditDB.Edit5.Text;
+      slow:=StringReplace(slow,',','{$1}',[rfReplaceAll]);
     end;
   finally
     FEditDB.Free;
@@ -373,7 +411,7 @@ begin
   if ok then
   begin
     s:=protokol+','+host+':'+IntToStr(port)+' ('+database+')';
-    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw+','+sfile;
+    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw+','+sfile+','+slow;
     Add(s,s2);
   end;
 end;
@@ -381,7 +419,7 @@ end;
 procedure TForm1.MenuItem2Click(Sender: TObject);
 var
   Data: PTreeData;
-  protokol,host,database,user,passw: string;
+  protokol,host,database,user,passw,slow: string;
   port: word;
   ok: boolean;
   s,s2: string;
@@ -401,6 +439,9 @@ begin
     FEditDB.Edit3.Text:=GetLineToStr(Data^.data,5,',');
     FEditDB.Edit4.Text:=GetLineToStr(Data^.data,6,',');
     FEditDB.FileNameEdit1.FileName:=GetLineToStr(Data^.data,7,',');
+    slow:=trim(GetLineToStr(Data^.data,8,','));
+    slow:=StringReplace(slow,'{$1}',',',[rfReplaceAll]);
+    FEditDB.Edit5.Text:=slow;
     FEditDB.ShowModal;
     ok:=FEditDB.io_ok;
     if ok then
@@ -417,6 +458,8 @@ begin
       user:=FEditDB.Edit3.Text;
       passw:=FEditDB.Edit4.Text;
       sfile:=FEditDB.FileNameEdit1.FileName;
+      slow:=FEditDB.Edit5.Text;
+      slow:=StringReplace(slow,',','{$1}',[rfReplaceAll]);
     end;
   finally
     FEditDB.Free;
@@ -424,7 +467,7 @@ begin
   if ok then
   begin
     s:=protokol+','+host+':'+IntToStr(port)+' ('+database+')';
-    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw+','+sfile;
+    s2:=protokol+','+host+','+IntToStr(port)+','+database+','+user+','+passw+','+sfile+','+slow;
     Data^.nazwa:=s;
     Data^.data:=s2;
   end;
@@ -544,7 +587,7 @@ var
 begin
   AskParent:=false;
   Data:=vst.GetNodeData(Node);
-  if Data<>nil then writeln('Data=',Data^.data,', Nazwa=',Data^.nazwa);
+  //if Data<>nil then writeln('Data=',Data^.data,', Nazwa=',Data^.nazwa);
   if Data=nil then APopupMenu:=PopupMenu1 else
   if Data^.rodzic then APopupMenu:=PopupMenu1 else
   if Data^.data='Group' then
@@ -602,6 +645,7 @@ begin
     3: TFRamkaView(aTab.Components[0]).Free;
     4: TFRamkaFunction(aTab.Components[0]).Free;
     5: TFRamkaProcedure(aTab.Components[0]).Free;
+    6: TFRamkaExec(aTab.Components[0]).Free;
   end;
 end;
 
@@ -950,10 +994,7 @@ begin
   repeat
     if XNode=nil then XNode:=VST.GetFirst else XNode:=VST.GetNext(XNode);
     Data:=VST.GetNodeData(XNode);
-    if Data^.rodzic then
-    begin
-      writeln(f,Data^.data);
-    end;
+    if Data^.rodzic then writeln(f,Data^.data);
   until XNode=VST.GetLast();
   closefile(f);
 end;
@@ -1124,7 +1165,7 @@ begin
     if (aNazwa='Funkcje') and (Data^.Data='Group') and (Data^.Nazwa='Funkcje') then vst.Expanded[XNode] else
     if (aNazwa='Procedury') and (Data^.Data='Group') and (Data^.Nazwa='Procedury') then vst.Expanded[XNode];
     Data:=vst.GetNodeData(XNode);
-    writeln('Znaleziono ("'+aData+'"/"'+aNazwa+'"): ',Data^.data,' (',Data^.nazwa,')');
+    //writeln('Znaleziono ("'+aData+'"/"'+aNazwa+'"): ',Data^.data,' (',Data^.nazwa,')');
     if (Data^.data=aData) and (Data^.nazwa=aNazwa) then
     begin
       result:=XNode;

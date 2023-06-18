@@ -1,0 +1,147 @@
+object FRamkaExec: TFRamkaExec
+  Left = 0
+  Height = 490
+  Top = 0
+  Width = 651
+  ClientHeight = 490
+  ClientWidth = 651
+  TabOrder = 0
+  DesignLeft = 2492
+  DesignTop = 388
+  object Label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 4
+    Height = 19
+    Top = 2
+    Width = 156
+    BorderSpacing.Left = 4
+    BorderSpacing.Top = 2
+    Caption = 'Wykonanie kodu funkcji:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    AnchorSideLeft.Control = Label1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Label1
+    Left = 164
+    Height = 19
+    Top = 2
+    Width = 43
+    BorderSpacing.Left = 4
+    Caption = 'Label2'
+    Color = clYellow
+    ParentColor = False
+    Transparent = False
+  end
+  object Panel1: TPanel
+    AnchorSideLeft.Control = Label1
+    AnchorSideTop.Control = Label1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 4
+    Height = 71
+    Top = 25
+    Width = 643
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 4
+    BorderSpacing.Right = 4
+    ClientHeight = 71
+    ClientWidth = 643
+    TabOrder = 0
+    object Label3: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel1
+      Left = 5
+      Height = 19
+      Top = 3
+      Width = 120
+      BorderSpacing.Left = 4
+      BorderSpacing.Top = 2
+      Caption = 'Parametry funkcji:'
+      ParentColor = False
+    end
+    object cExec: TBitBtn
+      Left = 32
+      Height = 30
+      Top = 32
+      Width = 75
+      Caption = 'Wykonaj'
+      OnClick = cExecClick
+      TabOrder = 0
+    end
+    object Label4: TLabel
+      AnchorSideLeft.Control = cExec
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = cExec
+      AnchorSideTop.Side = asrCenter
+      Left = 111
+      Height = 19
+      Top = 38
+      Width = 115
+      BorderSpacing.Left = 4
+      Caption = 'Rezultat funkcji = '
+      ParentColor = False
+    end
+    object Label5: TLabel
+      AnchorSideLeft.Control = Label4
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label4
+      Left = 228
+      Height = 19
+      Top = 38
+      Width = 200
+      Alignment = taCenter
+      BorderSpacing.Left = 2
+      Color = clYellow
+      Constraints.MinHeight = 19
+      Constraints.MinWidth = 200
+      ParentColor = False
+      Transparent = False
+    end
+  end
+  object asql: TZQuery
+    SQL.Strings = (
+      'show tables;'
+    )
+    Params = <>
+    Left = 40
+    Top = 424
+  end
+  object awejscie: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'nazwa'
+        DataType = ftString
+        Size = 255
+      end    
+      item
+        Name = 'typ'
+        DataType = ftString
+        Size = 255
+      end>
+    Left = 104
+    Top = 424
+  end
+  object dswejscie: TDataSource
+    DataSet = awejscie
+    Left = 184
+    Top = 424
+  end
+  object bsql: TZQuery
+    Params = <>
+    Left = 40
+    Top = 368
+  end
+  object mess: TExtMessage
+    Caption = '<Auto>'
+    HelpContext = 0
+    Position = psOwnerFormCenter
+    PosTop = 0
+    PosLeft = 0
+    StringToCR = '^'
+    Left = 104
+    Top = 368
+  end
+end

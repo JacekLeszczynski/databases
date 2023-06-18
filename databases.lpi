@@ -72,11 +72,11 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="databases"/>
+            <Filename Value="mariadb-manager"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="../../lib"/>
+            <OtherUnitFiles Value="../../lib;../../components/extlazarus"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -135,7 +135,7 @@
         <PackageName Value="LCL"/>
       </Item8>
     </RequiredPackages>
-    <Units Count="10">
+    <Units Count="11">
       <Unit0>
         <Filename Value="databases.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -203,6 +203,13 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit9>
+      <Unit10>
+        <Filename Value="ramka_exec.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FRamkaExec"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit10>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

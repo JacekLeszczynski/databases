@@ -8,7 +8,7 @@ uses
   {$ENDIF}
   Classes, CustApp, ExtParams, cverinfo,
   Interfaces, // this includes the LCL widgetset
-  Forms, rxnew, main, serwis
+  Forms, rxnew, main, serwis, ramka_exec
   { you can add units after this };
 
 {$R *.res}
