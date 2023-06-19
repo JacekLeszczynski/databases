@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ExtCtrls, Spin, Buttons,
-  ZDataset, ZConnection, ZTransaction, ExtMessage, memds, DB;
+  EditBtn, ZDataset, ZConnection, ZTransaction, ExtMessage, memds, DB;
 
 type
 
@@ -46,7 +46,7 @@ type
 implementation
 
 uses
-  serwis, ecode;
+  serwis, ecode, math;
 
 {$R *.lfm}
 
@@ -76,6 +76,9 @@ begin
       2: bsql.ParamByName('param'+IntToStr(i)).AsString:=TEdit(list[i]).Text;
       3: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TFloatSpinEdit(list[i]).Value;
       4: if TCheckBox(list[i]).Checked then bsql.ParamByName('param'+IntToStr(i)).AsInteger:=1 else bsql.ParamByName('param'+IntToStr(i)).AsInteger:=0;
+      5: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TSpinEdit(list[i]).Value;
+      6: bsql.ParamByName('param'+IntToStr(i)).AsDate:=TDateEdit(list[i]).Date;
+      7: bsql.ParamByName('param'+IntToStr(i)).AsTime:=TTimeEdit(list[i]).Time;
     end;
   end;
   try
@@ -150,6 +153,68 @@ begin
   aDecimalPlaces:=b;
 end;
 
+procedure GetIntMinMax(aDeclare: string; var aMin,aMax: extended);
+var
+  u: boolean;
+begin
+  u:=pos('UNSIGNED',aDeclare)>0;
+  if pos('TINYINT',aDeclare)>0 then
+  begin
+    if u then
+    begin
+      aMax:=127;
+      aMin:=-128;
+    end else begin
+      aMax:=255;
+      aMin:=0;
+    end;
+  end else
+  if pos('SMALLINT',aDeclare)>0 then
+  begin
+    if u then
+    begin
+      aMax:=32767;
+      aMin:=-32768;
+    end else begin
+      aMax:=65535;
+      aMin:=0;
+    end;
+  end else
+  if pos('MEDIUMINT',aDeclare)>0 then
+  begin
+    if u then
+    begin
+      aMax:=8388607;
+      aMin:=-8388608;
+    end else begin
+      aMax:=16777215;
+      aMin:=0;
+    end;
+  end else
+  if pos('INT',aDeclare)>0 then
+  begin
+    if u then
+    begin
+      aMax:=2147483647;
+      aMin:=-2147483648;
+    end else begin
+      aMax:=4294967295;
+      aMin:=0;
+    end;
+  end else
+  if pos('BIGINT',aDeclare)>0 then
+  begin
+    if u then
+    begin
+      aMax:=9223372036854775807;
+      aMin:=-9223372036854775808;
+    end else begin
+      aMax:=18446744073709551616;
+      aMin:=0;
+    end;
+  end;
+end;
+
 procedure TFRamkaExec.dodaj_kontrolki;
 const
   C_DLUGOSC = 150;
@@ -159,6 +224,7 @@ var
   s1,s2: string;
   n1,n2: integer;
   vMin,vMax: double;
+  vMin2,vMax2: extended;
   vDecimalPlaces: integer;
   wc: TWinControl;
   cl: TLabel;
@@ -166,6 +232,8 @@ var
   ci: TSpinEdit;
   cf: TFloatSpinEdit;
   cb: TCheckBox;
+  cd: TDateEdit;
+  ct: TTimeEdit;
 begin
   dlugosc_max:=Panel1.Width;
   n1:=0;
@@ -178,7 +246,7 @@ begin
     if s2='TEXT' then
     begin
       (* TLabel *)
-      typy.Add('1'); //TLabel
+      typy.Add('1');
       cl:=TLabel.Create(Panel1);
       cl.Parent:=Panel1;
       cl.Left:=24+(n1*C_DLUGOSC);
@@ -186,7 +254,7 @@ begin
       cl.Caption:=s1+':';
       list.Add(cl);
       (* TEdit *)
-      typy.Add('2'); //TEdit
+      typy.Add('2');
       ce:=TEdit.Create(Panel1);
       ce.Parent:=Panel1;
       ce.Left:=24+(n1*C_DLUGOSC);
@@ -201,7 +269,7 @@ begin
     if pos('NUMERIC',s2)>0 then
     begin
       (* TLabel *)
-      typy.Add('1'); //TLabel
+      typy.Add('1');
       cl:=TLabel.Create(Panel1);
       cl.Parent:=Panel1;
       cl.Left:=24+(n1*C_DLUGOSC);
@@ -209,7 +277,7 @@ begin
       cl.Caption:=s1+':';
       list.Add(cl);
       (* TFloatSpinEdit *)
-      typy.Add('3'); //TFloatSpinEdit
+      typy.Add('3');
       cf:=TFloatSpinEdit.Create(Panel1);
       cf.Parent:=Panel1;
       cf.Left:=24+(n1*C_DLUGOSC);
@@ -227,15 +295,15 @@ begin
     if s2='BOOLEAN' then
     begin
       (* TLabel *)
-      typy.Add('1'); //TLabel
+      typy.Add('1');
       cl:=TLabel.Create(Panel1);
       cl.Parent:=Panel1;
       cl.Left:=24+(n1*C_DLUGOSC);
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
-      (* TEdit *)
-      typy.Add('4'); //TCheckBox
+      (* TCheckBox *)
+      typy.Add('4');
       cb:=TCheckBox.Create(Panel1);
       cb.Parent:=Panel1;
       cb.Left:=24+(n1*C_DLUGOSC);
@@ -246,6 +314,78 @@ begin
       list.Add(cb);
       (* LICZNIK *)
       if (n1=0) and (n2=0) then wc:=cb;
+      inc(n1);
+    end else
+    if pos('INT',s2)>0 then
+    begin
+      (* TLabel *)
+      typy.Add('1');
+      cl:=TLabel.Create(Panel1);
+      cl.Parent:=Panel1;
+      cl.Left:=24+(n1*C_DLUGOSC);
+      cl.Top:=24+(n2*C_WYSOKOSC);
+      cl.Caption:=s1+':';
+      list.Add(cl);
+      (* TSpinEdit *)
+      typy.Add('5');
+      ci:=TSpinEdit.Create(Panel1);
+      ci.Parent:=Panel1;
+      ci.Left:=24+(n1*C_DLUGOSC);
+      ci.Top:=44+(n2*C_WYSOKOSC);
+      GetIntMinMax(s2,vMin2,vMax2);
+      ci.MinValue:=vMin2;
+      ci.MaxValue:=vMax2;
+      ci.Width:=C_DLUGOSC-10;
+      list.Add(ci);
+      (* LICZNIK *)
+      if (n1=0) and (n2=0) then wc:=ci;
+      inc(n1);
+    end else
+    if s2='DATE' then
+    begin
+      (* TLabel *)
+      typy.Add('1');
+      cl:=TLabel.Create(Panel1);
+      cl.Parent:=Panel1;
+      cl.Left:=24+(n1*C_DLUGOSC);
+      cl.Top:=24+(n2*C_WYSOKOSC);
+      cl.Caption:=s1+':';
+      list.Add(cl);
+      (* TDateEdit *)
+      typy.Add('6');
+      cd:=TDateEdit.Create(Panel1);
+      cd.Parent:=Panel1;
+      cd.Left:=24+(n1*C_DLUGOSC);
+      cd.Top:=44+(n2*C_WYSOKOSC);
+      cd.DateFormat:='yyyy-mm-dd';
+      cd.Date:=date;
+      cd.Width:=C_DLUGOSC-10;
+      list.Add(cd);
+      (* LICZNIK *)
+      if (n1=0) and (n2=0) then wc:=cd;
+      inc(n1);
+    end else
+    if s2='TIME' then
+    begin
+      (* TLabel *)
+      typy.Add('1');
+      cl:=TLabel.Create(Panel1);
+      cl.Parent:=Panel1;
+      cl.Left:=24+(n1*C_DLUGOSC);
+      cl.Top:=24+(n2*C_WYSOKOSC);
+      cl.Caption:=s1+':';
+      list.Add(cl);
+      (* TTimeEdit *)
+      typy.Add('7');
+      ct:=TTimeEdit.Create(Panel1);
+      ct.Parent:=Panel1;
+      ct.Left:=24+(n1*C_DLUGOSC);
+      ct.Top:=44+(n2*C_WYSOKOSC);
+      ct.Time:=time;
+      ct.Width:=C_DLUGOSC-10;
+      list.Add(ct);
+      (* LICZNIK *)
+      if (n1=0) and (n2=0) then wc:=ct;
       inc(n1);
     end;
     awejscie.Next;
@@ -270,6 +410,9 @@ begin
       2: TEdit(list[i]).Free;
       3: TFloatSpinEdit(list[i]).Free;
       4: TCheckBox(list[i]).Free;
+      5: TSpinEdit(list[i]).Free;
+      6: TDateEdit(list[i]).Free;
+      7: TTimeEdit(list[i]).Free;
     end;
   end;
 end;
