@@ -15,6 +15,7 @@ type
   TFRamkaExec = class(TFrame)
     asql: TZQuery;
     awejscie: TMemDataset;
+    CalcEdit1: TCalcEdit;
     cExec: TBitBtn;
     dswejscie: TDataSource;
     mess: TExtMessage;
@@ -27,10 +28,12 @@ type
     bsql: TZQuery;
     procedure cExecClick(Sender: TObject);
   private
-    typy: TStringList;
+    typy,cc1,cc2: TStringList;
     list: TList;
     procedure ShowFunction(nazwa: string; cialo: TStrings);
     function GetParameters: string;
+    function GetConfValue(aParam: string): string;
+    procedure SelectToItems(aSelect: string; aItems: TStrings);
     procedure dodaj_kontrolki;
     procedure usun_kontrolki;
   public
@@ -79,6 +82,8 @@ begin
       5: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TSpinEdit(list[i]).Value;
       6: bsql.ParamByName('param'+IntToStr(i)).AsDate:=TDateEdit(list[i]).Date;
       7: bsql.ParamByName('param'+IntToStr(i)).AsTime:=TTimeEdit(list[i]).Time;
+      8: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TFloatSpinEdit(list[i]).Value);
+      9: bsql.ParamByName('param'+IntToStr(i)).AsString:=TComboBox(list[i]).Text;
     end;
   end;
   try
@@ -125,6 +130,43 @@ begin
   awejscie.GotoBookmark(x);
   awejscie.EnableControls;
   result:=s;
+end;
+
+function TFRamkaExec.GetConfValue(aParam: string): string;
+var
+  i: integer;
+  s: string;
+begin
+  s:='';
+  for i:=0 to cc1.Count-1 do
+  begin
+    if cc1[i]=aParam then
+    begin
+      s:=cc2[i];
+      break;
+    end;
+  end;
+  result:=s;
+end;
+
+procedure TFRamkaExec.SelectToItems(aSelect: string; aItems: TStrings);
+var
+  q: TZQuery;
+begin
+  q:=TZQuery.Create(nil);
+  q.Connection:=io_db;
+  q.SQL.Add(aSelect);
+  try
+    q.Open;
+    while not q.EOF do
+    begin
+      aItems.Add(q.Fields[0].AsString);
+      q.Next;
+    end;
+    q.Close;
+  finally
+    q.Free;
+  end;
 end;
 
 procedure GetNumericMinMaxDecimalPlaces(aDeclare: string; var aMin,aMax: double; var aDecimalPlaces: integer);
@@ -221,7 +263,7 @@ const
   C_WYSOKOSC = 60;
 var
   dlugosc_max: integer;
-  s1,s2: string;
+  s1,s2,s3: string;
   n1,n2: integer;
   vMin,vMax: double;
   vMin2,vMax2: extended;
@@ -234,6 +276,7 @@ var
   cb: TCheckBox;
   cd: TDateEdit;
   ct: TTimeEdit;
+  ccb: TComboBox;
 begin
   dlugosc_max:=Panel1.Width;
   n1:=0;
@@ -243,6 +286,7 @@ begin
   begin
     s1:=awejscie.Fields[0].AsString; //nazwa pola
     s2:=awejscie.Fields[1].AsString; //typ pola
+    s3:=GetConfValue(s1);
     if s2='TEXT' then
     begin
       (* TLabel *)
@@ -253,17 +297,34 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
-      (* TEdit *)
-      typy.Add('2');
-      ce:=TEdit.Create(Panel1);
-      ce.Parent:=Panel1;
-      ce.Left:=24+(n1*C_DLUGOSC);
-      ce.Top:=44+(n2*C_WYSOKOSC);
-      ce.Caption:='';
-      ce.Width:=C_DLUGOSC-10;
-      list.Add(ce);
-      (* LICZNIK *)
-      if (n1=0) and (n2=0) then wc:=ce;
+      if s3='CALC' then s3:='';
+      if s3='' then
+      begin
+        (* TEdit *)
+        typy.Add('2');
+        ce:=TEdit.Create(Panel1);
+        ce.Parent:=Panel1;
+        ce.Left:=24+(n1*C_DLUGOSC);
+        ce.Top:=44+(n2*C_WYSOKOSC);
+        ce.Caption:='';
+        ce.Width:=C_DLUGOSC-10;
+        list.Add(ce);
+        (* LICZNIK *)
+        if (n1=0) and (n2=0) then wc:=ce;
+      end else begin
+        (* TEdit *)
+        typy.Add('9');
+        ccb:=TComboBox.Create(Panel1);
+        ccb.Parent:=Panel1;
+        ccb.Left:=24+(n1*C_DLUGOSC);
+        ccb.Top:=44+(n2*C_WYSOKOSC);
+        ccb.Width:=C_DLUGOSC-10;
+        ccb.Style:=csDropDownList;
+        SelectToItems(s3,ccb.Items);
+        list.Add(ccb);
+        (* LICZNIK *)
+        if (n1=0) and (n2=0) then wc:=ccb;
+      end;
       inc(n1);
     end else
     if pos('NUMERIC',s2)>0 then
@@ -316,7 +377,7 @@ begin
       if (n1=0) and (n2=0) then wc:=cb;
       inc(n1);
     end else
-    if pos('INT',s2)>0 then
+    if (pos('INT',s2)>0) and (pos('BIGINT',s2)=0) then
     begin
       (* TLabel *)
       typy.Add('1');
@@ -388,6 +449,32 @@ begin
       if (n1=0) and (n2=0) then wc:=ct;
       inc(n1);
     end;
+    if pos('BIGINT',s2)>0 then
+    begin
+      (* TLabel *)
+      typy.Add('1');
+      cl:=TLabel.Create(Panel1);
+      cl.Parent:=Panel1;
+      cl.Left:=24+(n1*C_DLUGOSC);
+      cl.Top:=24+(n2*C_WYSOKOSC);
+      cl.Caption:=s1+':';
+      list.Add(cl);
+      (* TFloatSpinEdit - BIGINT *)
+      typy.Add('8');
+      cf:=TFloatSpinEdit.Create(Panel1);
+      cf.Parent:=Panel1;
+      cf.Left:=24+(n1*C_DLUGOSC);
+      cf.Top:=44+(n2*C_WYSOKOSC);
+      GetIntMinMax(s2,vMin2,vMax2);
+      cf.MinValue:=vMin2;
+      cf.MaxValue:=vMax2;
+      cf.DecimalPlaces:=0;
+      cf.Width:=C_DLUGOSC-10;
+      list.Add(cf);
+      (* LICZNIK *)
+      if (n1=0) and (n2=0) then wc:=cf;
+      inc(n1);
+    end;
     awejscie.Next;
   end;
   n1:=0;
@@ -413,6 +500,8 @@ begin
       5: TSpinEdit(list[i]).Free;
       6: TDateEdit(list[i]).Free;
       7: TTimeEdit(list[i]).Free;
+      8: TFloatSpinEdit(list[i]).Free;
+      9: TComboBox(list[i]).Free;
     end;
   end;
 end;
@@ -422,6 +511,8 @@ begin
   inherited Create(AOwner);
   typy:=TStringList.Create;
   list:=TList.Create;
+  cc1:=TStringList.Create;
+  cc2:=TStringList.Create;
 end;
 
 destructor TFRamkaExec.Destroy;
@@ -429,6 +520,8 @@ begin
   usun_kontrolki;
   typy.Free;
   list.Free;
+  cc1.Free;
+  cc2.Free;
   inherited Destroy;
 end;
 
@@ -440,7 +533,7 @@ end;
 
 procedure TFRamkaExec.load_function;
 var
-  schema: TStrings;
+  schema,ss: TStrings;
   s,pom,pom2: string;
   a,i: integer;
   s1,s2: string;
@@ -449,6 +542,7 @@ begin //[rfReplaceAll,rfIgnoreCase]
   awejscie.Open;
   schema:=TStringList.Create;
   try
+    (* pobranie nazwy funkcji i parametrów *)
     ShowFunction(io_tablename,schema);
     s:=schema.Text;
     s:=trim(StringReplace(s,'CREATE FUNCTION','',[rfIgnoreCase]));
@@ -482,10 +576,33 @@ begin //[rfReplaceAll,rfIgnoreCase]
     a:=pos(#10,s);
     s2:=upcase(copy(s,1,a-1)); //typ zwracanej wartosci przez funkcję
     delete(s,1,a);
+    Label2.Caption:=' '+s2+' = '+s1+'('+pom+') ';
+    (* pobranie konfiguracji pól - jeśli istnieją *)
+    ss:=TStringList.Create;
+    try
+      ss.AddText(schema.Text);
+      for i:=0 to ss.Count-1 do
+      begin
+        s:=trim(ss[i]);
+        a:=pos('-- $',s);
+        if a>0 then
+        begin
+          s:=GetLineToStr(s,2,'$');
+          s1:=trim(GetLineToStr(s,1,'='));
+          s2:=trim(GetLineToStr(s,2,'='));
+          if (s1<>'') and (s2<>'') then
+          begin
+            cc1.Add(s1);
+            cc2.Add(s2);
+          end;
+        end;
+      end;
+    finally
+      ss.Free
+    end;
   finally
     schema.Free;
   end;
-  Label2.Caption:=' '+s2+' = '+s1+'('+pom+') ';
   dodaj_kontrolki;
 end;
 

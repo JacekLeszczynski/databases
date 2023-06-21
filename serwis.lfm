@@ -1,7 +1,7 @@
 object dm: Tdm
   OldCreateOrder = False
   Height = 293
-  HorizontalOffset = 2313
+  HorizontalOffset = 1491
   VerticalOffset = 707
   Width = 379
   object db: TZConnection
