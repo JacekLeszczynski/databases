@@ -15,7 +15,6 @@ type
   TFRamkaExec = class(TFrame)
     asql: TZQuery;
     awejscie: TMemDataset;
-    CalcEdit1: TCalcEdit;
     cExec: TBitBtn;
     dswejscie: TDataSource;
     mess: TExtMessage;
@@ -75,15 +74,18 @@ begin
   for i:=0 to list.Count-1 do
   begin
     case StrToInt(typy[i]) of
-      1: continue;
-      2: bsql.ParamByName('param'+IntToStr(i)).AsString:=TEdit(list[i]).Text;
-      3: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TFloatSpinEdit(list[i]).Value;
-      4: if TCheckBox(list[i]).Checked then bsql.ParamByName('param'+IntToStr(i)).AsInteger:=1 else bsql.ParamByName('param'+IntToStr(i)).AsInteger:=0;
-      5: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TSpinEdit(list[i]).Value;
-      6: bsql.ParamByName('param'+IntToStr(i)).AsDate:=TDateEdit(list[i]).Date;
-      7: bsql.ParamByName('param'+IntToStr(i)).AsTime:=TTimeEdit(list[i]).Time;
-      8: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TFloatSpinEdit(list[i]).Value);
-      9: bsql.ParamByName('param'+IntToStr(i)).AsString:=TComboBox(list[i]).Text;
+       1: continue;
+       2: bsql.ParamByName('param'+IntToStr(i)).AsString:=TEdit(list[i]).Text;
+       3: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TFloatSpinEdit(list[i]).Value;
+       4: if TCheckBox(list[i]).Checked then bsql.ParamByName('param'+IntToStr(i)).AsInteger:=1 else bsql.ParamByName('param'+IntToStr(i)).AsInteger:=0;
+       5: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TFloatSpinEdit(list[i]).Value);
+       6: bsql.ParamByName('param'+IntToStr(i)).AsDate:=TDateEdit(list[i]).Date;
+       7: bsql.ParamByName('param'+IntToStr(i)).AsTime:=TTimeEdit(list[i]).Time;
+       8: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TSpinEdit(list[i]).Value;
+       9: bsql.ParamByName('param'+IntToStr(i)).AsString:=TComboBox(list[i]).Text;
+      10: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TCalcEdit(list[i]).AsFloat;
+      11: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TCalcEdit(list[i]).AsFloat);
+      12: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TCalcEdit(list[i]).AsInteger;
     end;
   end;
   try
@@ -277,6 +279,7 @@ var
   cd: TDateEdit;
   ct: TTimeEdit;
   ccb: TComboBox;
+  calc: TCalcEdit;
 begin
   dlugosc_max:=Panel1.Width;
   n1:=0;
@@ -337,20 +340,35 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
-      (* TFloatSpinEdit *)
-      typy.Add('3');
-      cf:=TFloatSpinEdit.Create(Panel1);
-      cf.Parent:=Panel1;
-      cf.Left:=24+(n1*C_DLUGOSC);
-      cf.Top:=44+(n2*C_WYSOKOSC);
-      GetNumericMinMaxDecimalPlaces(s2,vMin,vMax,vDecimalPlaces);
-      cf.MinValue:=vMin;
-      cf.MaxValue:=vMax;
-      cf.DecimalPlaces:=vDecimalPlaces;
-      cf.Width:=C_DLUGOSC-10;
-      list.Add(cf);
+      if s3<>'CALC' then s3:='';
+      if s3='' then
+      begin
+        (* TFloatSpinEdit *)
+        typy.Add('3');
+        cf:=TFloatSpinEdit.Create(Panel1);
+        cf.Parent:=Panel1;
+        cf.Left:=24+(n1*C_DLUGOSC);
+        cf.Top:=44+(n2*C_WYSOKOSC);
+        GetNumericMinMaxDecimalPlaces(s2,vMin,vMax,vDecimalPlaces);
+        cf.MinValue:=vMin;
+        cf.MaxValue:=vMax;
+        cf.DecimalPlaces:=vDecimalPlaces;
+        cf.Width:=C_DLUGOSC-10;
+        list.Add(cf);
+        if (n1=0) and (n2=0) then wc:=cf;
+      end else begin
+        (* TFloatSpinEdit *)
+        typy.Add('10');
+        calc:=TCalcEdit.Create(Panel1);
+        calc.Parent:=Panel1;
+        calc.Left:=24+(n1*C_DLUGOSC);
+        calc.Top:=44+(n2*C_WYSOKOSC);
+        calc.Width:=C_DLUGOSC-10;
+        calc.Flat:=true;
+        list.Add(calc);
+        if (n1=0) and (n2=0) then wc:=calc;
+      end;
       (* LICZNIK *)
-      if (n1=0) and (n2=0) then wc:=cf;
       inc(n1);
     end else
     if s2='BOOLEAN' then
@@ -377,7 +395,7 @@ begin
       if (n1=0) and (n2=0) then wc:=cb;
       inc(n1);
     end else
-    if (pos('INT',s2)>0) and (pos('BIGINT',s2)=0) then
+    if pos('BIGINT',s2)>0 then
     begin
       (* TLabel *)
       typy.Add('1');
@@ -387,19 +405,75 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
-      (* TSpinEdit *)
-      typy.Add('5');
-      ci:=TSpinEdit.Create(Panel1);
-      ci.Parent:=Panel1;
-      ci.Left:=24+(n1*C_DLUGOSC);
-      ci.Top:=44+(n2*C_WYSOKOSC);
-      GetIntMinMax(s2,vMin2,vMax2);
-      ci.MinValue:=vMin2;
-      ci.MaxValue:=vMax2;
-      ci.Width:=C_DLUGOSC-10;
-      list.Add(ci);
+      if s3<>'CALC' then s3:='';
+      if s3='' then
+      begin
+        (* TFloatSpinEdit - BIGINT *)
+        typy.Add('5');
+        cf:=TFloatSpinEdit.Create(Panel1);
+        cf.Parent:=Panel1;
+        cf.Left:=24+(n1*C_DLUGOSC);
+        cf.Top:=44+(n2*C_WYSOKOSC);
+        GetIntMinMax(s2,vMin2,vMax2);
+        cf.MinValue:=vMin2;
+        cf.MaxValue:=vMax2;
+        cf.DecimalPlaces:=0;
+        cf.Width:=C_DLUGOSC-10;
+        list.Add(cf);
+        if (n1=0) and (n2=0) then wc:=cf;
+      end else begin
+        (* TFloatSpinEdit *)
+        typy.Add('11');
+        calc:=TCalcEdit.Create(Panel1);
+        calc.Parent:=Panel1;
+        calc.Left:=24+(n1*C_DLUGOSC);
+        calc.Top:=44+(n2*C_WYSOKOSC);
+        calc.Width:=C_DLUGOSC-10;
+        calc.Flat:=true;
+        list.Add(calc);
+        if (n1=0) and (n2=0) then wc:=calc;
+      end;
       (* LICZNIK *)
-      if (n1=0) and (n2=0) then wc:=ci;
+      inc(n1);
+    end else
+    if pos('INT',s2)>0 then
+    begin
+      (* TLabel *)
+      typy.Add('1');
+      cl:=TLabel.Create(Panel1);
+      cl.Parent:=Panel1;
+      cl.Left:=24+(n1*C_DLUGOSC);
+      cl.Top:=24+(n2*C_WYSOKOSC);
+      cl.Caption:=s1+':';
+      list.Add(cl);
+      if s3<>'CALC' then s3:='';
+      if s3='' then
+      begin
+        (* TSpinEdit *)
+        typy.Add('8');
+        ci:=TSpinEdit.Create(Panel1);
+        ci.Parent:=Panel1;
+        ci.Left:=24+(n1*C_DLUGOSC);
+        ci.Top:=44+(n2*C_WYSOKOSC);
+        GetIntMinMax(s2,vMin2,vMax2);
+        ci.MinValue:=vMin2;
+        ci.MaxValue:=vMax2;
+        ci.Width:=C_DLUGOSC-10;
+        list.Add(ci);
+        if (n1=0) and (n2=0) then wc:=ci;
+      end else begin
+        (* TFloatSpinEdit *)
+        typy.Add('12');
+        calc:=TCalcEdit.Create(Panel1);
+        calc.Parent:=Panel1;
+        calc.Left:=24+(n1*C_DLUGOSC);
+        calc.Top:=44+(n2*C_WYSOKOSC);
+        calc.Width:=C_DLUGOSC-10;
+        calc.Flat:=true;
+        list.Add(calc);
+        if (n1=0) and (n2=0) then wc:=calc;
+      end;
+      (* LICZNIK *)
       inc(n1);
     end else
     if s2='DATE' then
@@ -449,32 +523,6 @@ begin
       if (n1=0) and (n2=0) then wc:=ct;
       inc(n1);
     end;
-    if pos('BIGINT',s2)>0 then
-    begin
-      (* TLabel *)
-      typy.Add('1');
-      cl:=TLabel.Create(Panel1);
-      cl.Parent:=Panel1;
-      cl.Left:=24+(n1*C_DLUGOSC);
-      cl.Top:=24+(n2*C_WYSOKOSC);
-      cl.Caption:=s1+':';
-      list.Add(cl);
-      (* TFloatSpinEdit - BIGINT *)
-      typy.Add('8');
-      cf:=TFloatSpinEdit.Create(Panel1);
-      cf.Parent:=Panel1;
-      cf.Left:=24+(n1*C_DLUGOSC);
-      cf.Top:=44+(n2*C_WYSOKOSC);
-      GetIntMinMax(s2,vMin2,vMax2);
-      cf.MinValue:=vMin2;
-      cf.MaxValue:=vMax2;
-      cf.DecimalPlaces:=0;
-      cf.Width:=C_DLUGOSC-10;
-      list.Add(cf);
-      (* LICZNIK *)
-      if (n1=0) and (n2=0) then wc:=cf;
-      inc(n1);
-    end;
     awejscie.Next;
   end;
   n1:=0;
@@ -493,15 +541,18 @@ begin
   begin
     a:=StrToInt(typy[i]);
     case a of
-      1: TLabel(list[i]).Free;
-      2: TEdit(list[i]).Free;
-      3: TFloatSpinEdit(list[i]).Free;
-      4: TCheckBox(list[i]).Free;
-      5: TSpinEdit(list[i]).Free;
-      6: TDateEdit(list[i]).Free;
-      7: TTimeEdit(list[i]).Free;
-      8: TFloatSpinEdit(list[i]).Free;
-      9: TComboBox(list[i]).Free;
+       1: TLabel(list[i]).Free;
+       2: TEdit(list[i]).Free;
+       3: TFloatSpinEdit(list[i]).Free;
+       4: TCheckBox(list[i]).Free;
+       5: TFloatSpinEdit(list[i]).Free;
+       6: TDateEdit(list[i]).Free;
+       7: TTimeEdit(list[i]).Free;
+       8: TSpinEdit(list[i]).Free;
+       9: TComboBox(list[i]).Free;
+      10: TCalcEdit(list[i]).Free;
+      11: TCalcEdit(list[i]).Free;
+      12: TCalcEdit(list[i]).Free;
     end;
   end;
 end;

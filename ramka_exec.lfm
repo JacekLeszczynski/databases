@@ -100,27 +100,6 @@ object FRamkaExec: TFRamkaExec
       ParentColor = False
       Transparent = False
     end
-    object CalcEdit1: TCalcEdit
-      AnchorSideTop.Control = Panel1
-      AnchorSideRight.Control = Panel1
-      AnchorSideRight.Side = asrBottom
-      Left = 426
-      Height = 31
-      Top = 1
-      Width = 216
-      CalculatorLayout = clNormal
-      AsInteger = 0
-      ButtonWidth = 23
-      DialogPosition = poOwnerFormCenter
-      DialogTop = 0
-      DialogLeft = 0
-      NumGlyphs = 1
-      Flat = True
-      Anchors = [akTop, akRight]
-      MaxLength = 0
-      TabOrder = 1
-      Text = '0'
-    end
   end
   object asql: TZQuery
     SQL.Strings = (
