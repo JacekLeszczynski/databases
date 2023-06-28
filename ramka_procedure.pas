@@ -242,7 +242,7 @@ begin //[rfReplaceAll,rfIgnoreCase]
       awejscie.Append;
       awejscie.FieldByName('nazwa').AsString:=GetLineToStr(pom2,2,' ');
       awejscie.FieldByName('oper').AsString:=upcase(GetLineToStr(pom2,1,' '));
-      awejscie.FieldByName('typ').AsString:=upcase(GetLineToStr(pom2,3,' '));
+      awejscie.FieldByName('typ').AsString:=trim(upcase(GetLineToStr(pom2,3,' '))+' '+upcase(GetLineToStr(pom2,4,' ')));
       awejscie.Post;
     end;
     a:=pos('BEGIN',s);
