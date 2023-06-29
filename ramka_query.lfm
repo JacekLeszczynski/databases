@@ -531,12 +531,15 @@ object FRamkaQuery: TFRamkaQuery
         AnchorSideTop.Control = Panel2
         Left = 0
         Height = 26
+        Hint = 'Wykonaj zapytanie'
         Top = 0
         Width = 26
         Flat = True
         Images = Form1.im_button
         ImageIndex = 0
         OnClick = SpeedButton1Click
+        ShowHint = True
+        ParentShowHint = False
       end
       object cScript: TCheckBox
         AnchorSideLeft.Control = DBNavigator1
@@ -557,12 +560,15 @@ object FRamkaQuery: TFRamkaQuery
         AnchorSideTop.Control = SpeedButton1
         Left = 26
         Height = 26
+        Hint = 'Otwórz transakcję'
         Top = 0
         Width = 26
         Flat = True
         Images = Form1.im_button
         ImageIndex = 1
         OnClick = SpeedButton2Click
+        ShowHint = True
+        ParentShowHint = False
       end
       object SpeedButton3: TSpeedButton
         AnchorSideLeft.Control = SpeedButton2
@@ -570,6 +576,7 @@ object FRamkaQuery: TFRamkaQuery
         AnchorSideTop.Control = SpeedButton1
         Left = 52
         Height = 26
+        Hint = 'Zatwierdź transakcję'
         Top = 0
         Width = 26
         Enabled = False
@@ -577,6 +584,8 @@ object FRamkaQuery: TFRamkaQuery
         Images = Form1.im_button
         ImageIndex = 2
         OnClick = SpeedButton3Click
+        ShowHint = True
+        ParentShowHint = False
       end
       object SpeedButton4: TSpeedButton
         AnchorSideLeft.Control = SpeedButton3
@@ -584,6 +593,7 @@ object FRamkaQuery: TFRamkaQuery
         AnchorSideTop.Control = SpeedButton1
         Left = 78
         Height = 26
+        Hint = 'Wycofaj transakcję'
         Top = 0
         Width = 26
         Enabled = False
@@ -591,6 +601,8 @@ object FRamkaQuery: TFRamkaQuery
         Images = Form1.im_button
         ImageIndex = 3
         OnClick = SpeedButton4Click
+        ShowHint = True
+        ParentShowHint = False
       end
       object SpeedButton5: TSpeedButton
         AnchorSideLeft.Control = SpeedButton4
@@ -598,9 +610,16 @@ object FRamkaQuery: TFRamkaQuery
         AnchorSideTop.Control = SpeedButton1
         Left = 104
         Height = 26
+        Hint = 'Zamknij zapytanie'
         Top = 0
         Width = 26
+        Enabled = False
         Flat = True
+        Images = Form1.im_button
+        ImageIndex = 4
+        OnClick = SpeedButton5Click
+        ShowHint = True
+        ParentShowHint = False
       end
       object SpeedButton6: TSpeedButton
         AnchorSideLeft.Control = SpeedButton5
@@ -642,6 +661,8 @@ object FRamkaQuery: TFRamkaQuery
         DataSource = ds_asql
         Flat = True
         Options = []
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
       end
       object cAutoFillCol: TCheckBox
@@ -706,6 +727,7 @@ object FRamkaQuery: TFRamkaQuery
   end
   object asql: TZQuery
     AfterOpen = asqlAfterOpen
+    AfterClose = asqlAfterClose
     SQL.Strings = (
       'show tables;'
     )

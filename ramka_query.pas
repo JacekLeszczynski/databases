@@ -38,12 +38,14 @@ type
     Panel1: TPanel;
     sql: TSynEdit;
     SynSQLSyn1: TSynSQLSyn;
+    procedure asqlAfterClose(DataSet: TDataSet);
     procedure asqlAfterOpen(DataSet: TDataSet);
     procedure cAutoFillColChange(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
     procedure SpeedButton4Click(Sender: TObject);
+    procedure SpeedButton5Click(Sender: TObject);
     procedure sqlKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
       );
   private
@@ -100,6 +102,12 @@ begin
       else DBGrid1.Columns[i].Font.Size:=10;
     end;
   end;
+  SpeedButton5.Enabled:=true;
+end;
+
+procedure TFRamkaQuery.asqlAfterClose(DataSet: TDataSet);
+begin
+  SpeedButton5.Enabled:=false;
 end;
 
 procedure TFRamkaQuery.SpeedButton2Click(Sender: TObject);
@@ -124,6 +132,11 @@ begin
   SpeedButton2.Enabled:=true;
   SpeedButton3.Enabled:=false;
   SpeedButton4.Enabled:=false;
+end;
+
+procedure TFRamkaQuery.SpeedButton5Click(Sender: TObject);
+begin
+  asql.Close;
 end;
 
 procedure TFRamkaQuery.sqlKeyDown(Sender: TObject; var Key: Word;

@@ -6,8 +6,8 @@ object FRamkaProcedure: TFRamkaProcedure
   ClientHeight = 523
   ClientWidth = 894
   TabOrder = 0
-  DesignLeft = 2304
-  DesignTop = 345
+  DesignLeft = 2635
+  DesignTop = 466
   object Label1: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner

@@ -109,26 +109,6 @@ object FRamkaExec: TFRamkaExec
     Left = 40
     Top = 424
   end
-  object awejscie: TMemDataset
-    FieldDefs = <    
-      item
-        Name = 'nazwa'
-        DataType = ftString
-        Size = 255
-      end    
-      item
-        Name = 'typ'
-        DataType = ftString
-        Size = 255
-      end>
-    Left = 104
-    Top = 424
-  end
-  object dswejscie: TDataSource
-    DataSet = awejscie
-    Left = 184
-    Top = 424
-  end
   object bsql: TZQuery
     Params = <>
     Left = 40
@@ -143,5 +123,31 @@ object FRamkaExec: TFRamkaExec
     StringToCR = '^'
     Left = 104
     Top = 368
+  end
+  object awejscie: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'nazwa'
+        DataType = ftString
+        Size = 255
+      end    
+      item
+        Name = 'oper'
+        DataType = ftString
+        Size = 5
+      end    
+      item
+        Name = 'typ'
+        DataType = ftString
+        Size = 255
+      end>
+    BeforeClose = awejscieBeforeClose
+    Left = 104
+    Top = 424
+  end
+  object dswejscie: TDataSource
+    DataSet = awejscie
+    Left = 184
+    Top = 424
   end
 end

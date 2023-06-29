@@ -12,6 +12,7 @@ type
 
   { TFRamkaExec }
 
+  TFRamkaExecType = (etFunction,etProcedure);
   TFRamkaExec = class(TFrame)
     asql: TZQuery;
     awejscie: TMemDataset;
@@ -25,17 +26,20 @@ type
     Label5: TLabel;
     Panel1: TPanel;
     bsql: TZQuery;
+    procedure awejscieBeforeClose(DataSet: TDataSet);
     procedure cExecClick(Sender: TObject);
   private
     typy,cc1,cc2: TStringList;
     list: TList;
     procedure ShowFunction(nazwa: string; cialo: TStrings);
+    procedure ShowProcedure(nazwa: string; cialo: TStrings);
     function GetParameters: string;
     function GetConfValue(aParam: string): string;
     procedure SelectToItems(aSelect: string; aItems: TStrings);
     procedure dodaj_kontrolki;
     procedure usun_kontrolki;
   public
+    io_type: TFRamkaExecType;
     io_db: TZConnection;
     io_trans: TZTransaction;
     io_tablename: string;
@@ -43,6 +47,7 @@ type
     destructor Destroy; override;
     procedure init;
     procedure load_function;
+    procedure load_procedure;
   end;
 
 implementation
@@ -97,6 +102,11 @@ begin
   end;
 end;
 
+procedure TFRamkaExec.awejscieBeforeClose(DataSet: TDataSet);
+begin
+  while not Dataset.IsEmpty do Dataset.Delete;
+end;
+
 procedure TFRamkaExec.ShowFunction(nazwa: string; cialo: TStrings);
 var
   q1: TZQuery;
@@ -108,6 +118,23 @@ begin
   try
     q1.Open;
     cialo.Add(NormalizeCialoFunkcji(q1.FieldByName('Create Function').AsString));
+    q1.Close;
+  finally
+    q1.Free;
+  end;
+end;
+
+procedure TFRamkaExec.ShowProcedure(nazwa: string; cialo: TStrings);
+var
+  q1: TZQuery;
+begin
+  cialo.Clear;
+  q1:=TZQuery.Create(self);
+  q1.Connection:=io_db;
+  q1.SQL.Add('show create procedure '+nazwa);
+  try
+    q1.Open;
+    cialo.Add(NormalizeCialoProcedury(q1.FieldByName('Create Procedure').AsString));
     q1.Close;
   finally
     q1.Free;
@@ -265,8 +292,8 @@ const
   C_WYSOKOSC = 60;
 var
   dlugosc_max: integer;
-  s1,s2,s3: string;
-  n1,n2: integer;
+  s1,s2,s3,rodzaj: string;
+  r,n1,n2: integer;
   vMin,vMax: double;
   vMin2,vMax2: extended;
   vDecimalPlaces: integer;
@@ -288,8 +315,20 @@ begin
   while not awejscie.EOF do
   begin
     s1:=awejscie.Fields[0].AsString; //nazwa pola
-    s2:=awejscie.Fields[1].AsString; //typ pola
+    if io_type=etProcedure then rodzaj:=awejscie.Fields[1].AsString else rodzaj:='IN'; //IN,OUT,INOUT
+    s2:=awejscie.Fields[2].AsString; //typ pola
     s3:=GetConfValue(s1);
+    (*
+       rodzaj: 0 - [brak informacji]
+               1 - IN
+               2 - INOUT
+               3 - OUT
+       IN  = <3
+       OUT = >1
+    *)
+    if rodzaj='IN' then r:=1 else
+    if rodzaj='INOUT' then r:=2 else
+    if rodzaj='OUT' then r:=3 else r:=0;
     if s2='TEXT' then
     begin
       (* TLabel *)
@@ -306,6 +345,7 @@ begin
         (* TEdit *)
         typy.Add('2');
         ce:=TEdit.Create(Panel1);
+        ce.Tag:=r;
         ce.Parent:=Panel1;
         ce.Left:=24+(n1*C_DLUGOSC);
         ce.Top:=44+(n2*C_WYSOKOSC);
@@ -318,6 +358,7 @@ begin
         (* TEdit *)
         typy.Add('9');
         ccb:=TComboBox.Create(Panel1);
+        ccb.Tag:=r;
         ccb.Parent:=Panel1;
         ccb.Left:=24+(n1*C_DLUGOSC);
         ccb.Top:=44+(n2*C_WYSOKOSC);
@@ -346,6 +387,7 @@ begin
         (* TFloatSpinEdit *)
         typy.Add('3');
         cf:=TFloatSpinEdit.Create(Panel1);
+        cf.Tag:=r;
         cf.Parent:=Panel1;
         cf.Left:=24+(n1*C_DLUGOSC);
         cf.Top:=44+(n2*C_WYSOKOSC);
@@ -360,6 +402,7 @@ begin
         (* TFloatSpinEdit *)
         typy.Add('10');
         calc:=TCalcEdit.Create(Panel1);
+        calc.Tag:=r;
         calc.Parent:=Panel1;
         calc.Left:=24+(n1*C_DLUGOSC);
         calc.Top:=44+(n2*C_WYSOKOSC);
@@ -384,6 +427,7 @@ begin
       (* TCheckBox *)
       typy.Add('4');
       cb:=TCheckBox.Create(Panel1);
+      cb.Tag:=r;
       cb.Parent:=Panel1;
       cb.Left:=24+(n1*C_DLUGOSC);
       cb.Top:=44+(n2*C_WYSOKOSC);
@@ -411,6 +455,7 @@ begin
         (* TFloatSpinEdit - BIGINT *)
         typy.Add('5');
         cf:=TFloatSpinEdit.Create(Panel1);
+        cf.Tag:=r;
         cf.Parent:=Panel1;
         cf.Left:=24+(n1*C_DLUGOSC);
         cf.Top:=44+(n2*C_WYSOKOSC);
@@ -425,6 +470,7 @@ begin
         (* TFloatSpinEdit *)
         typy.Add('11');
         calc:=TCalcEdit.Create(Panel1);
+        calc.Tag:=r;
         calc.Parent:=Panel1;
         calc.Left:=24+(n1*C_DLUGOSC);
         calc.Top:=44+(n2*C_WYSOKOSC);
@@ -452,6 +498,7 @@ begin
         (* TSpinEdit *)
         typy.Add('8');
         ci:=TSpinEdit.Create(Panel1);
+        ci.Tag:=r;
         ci.Parent:=Panel1;
         ci.Left:=24+(n1*C_DLUGOSC);
         ci.Top:=44+(n2*C_WYSOKOSC);
@@ -465,6 +512,7 @@ begin
         (* TFloatSpinEdit *)
         typy.Add('12');
         calc:=TCalcEdit.Create(Panel1);
+        calc.Tag:=r;
         calc.Parent:=Panel1;
         calc.Left:=24+(n1*C_DLUGOSC);
         calc.Top:=44+(n2*C_WYSOKOSC);
@@ -489,6 +537,7 @@ begin
       (* TDateEdit *)
       typy.Add('6');
       cd:=TDateEdit.Create(Panel1);
+      cd.Tag:=r;
       cd.Parent:=Panel1;
       cd.Left:=24+(n1*C_DLUGOSC);
       cd.Top:=44+(n2*C_WYSOKOSC);
@@ -513,6 +562,7 @@ begin
       (* TTimeEdit *)
       typy.Add('7');
       ct:=TTimeEdit.Create(Panel1);
+      ct.Tag:=r;
       ct.Parent:=Panel1;
       ct.Left:=24+(n1*C_DLUGOSC);
       ct.Top:=44+(n2*C_WYSOKOSC);
@@ -580,6 +630,8 @@ procedure TFRamkaExec.init;
 begin
   asql.Connection:=io_db;
   bsql.Connection:=io_db;
+  Label4.Visible:=io_type=etFunction;
+  Label5.Visible:=Label4.Visible;
 end;
 
 procedure TFRamkaExec.load_function;
@@ -619,6 +671,7 @@ begin //[rfReplaceAll,rfIgnoreCase]
       if pom2='' then break;
       awejscie.Append;
       awejscie.FieldByName('nazwa').AsString:=GetLineToStr(pom2,1,' ');
+      awejscie.FieldByName('oper').AsString:='IN';
       awejscie.FieldByName('typ').AsString:=upcase(GetLineToStr(pom2,2,' '));
       awejscie.Post;
     end;
@@ -628,6 +681,72 @@ begin //[rfReplaceAll,rfIgnoreCase]
     s2:=upcase(copy(s,1,a-1)); //typ zwracanej wartosci przez funkcję
     delete(s,1,a);
     Label2.Caption:=' '+s2+' = '+s1+'('+pom+') ';
+    (* pobranie konfiguracji pól - jeśli istnieją *)
+    ss:=TStringList.Create;
+    try
+      ss.AddText(schema.Text);
+      for i:=0 to ss.Count-1 do
+      begin
+        s:=trim(ss[i]);
+        a:=pos('-- $',s);
+        if a>0 then
+        begin
+          s:=GetLineToStr(s,2,'$');
+          s1:=trim(GetLineToStr(s,1,'='));
+          s2:=trim(GetLineToStr(s,2,'='));
+          if (s1<>'') and (s2<>'') then
+          begin
+            cc1.Add(s1);
+            cc2.Add(s2);
+          end;
+        end;
+      end;
+    finally
+      ss.Free
+    end;
+  finally
+    schema.Free;
+  end;
+  dodaj_kontrolki;
+end;
+
+procedure TFRamkaExec.load_procedure;
+var
+  schema,ss: TStrings;
+  s,s1,s2,pom,pom2: string;
+  a,i: integer;
+begin //[rfReplaceAll,rfIgnoreCase]
+  if awejscie.Active then awejscie.Close;
+  awejscie.Open;
+  schema:=TStringList.Create;
+  try
+    ShowProcedure(io_tablename,schema);
+    s:=schema.Text;
+    s:=trim(StringReplace(s,'CREATE PROCEDURE','',[rfIgnoreCase]));
+    //s:=StringReplace(s,'int(10)','int',[rfReplaceAll,rfIgnoreCase]);
+    //s:=StringReplace(s,'int(11)','int',[rfReplaceAll,rfIgnoreCase]);
+    //s:=StringReplace(s,'tinyint(4)','tinyint',[rfReplaceAll,rfIgnoreCase]);
+    //s:=StringReplace(s,'tinyint(5)','tinyint',[rfReplaceAll,rfIgnoreCase]);
+    //s:=StringReplace(s,'smallint(5)','smallint',[rfReplaceAll,rfIgnoreCase]);
+    //s:=StringReplace(s,'smallint(6)','smallint',[rfReplaceAll,rfIgnoreCase]);
+    a:=pos('(',s);
+    s1:=copy(s,1,a-1); //Nazwa procedury
+    pom:=PoleToNazwa(s);
+    i:=0;
+    while true do
+    begin
+      inc(i);
+      pom2:=trim(GetLineToStr(pom,i,','));
+      if pom2='' then break;
+      awejscie.Append;
+      awejscie.FieldByName('nazwa').AsString:=GetLineToStr(pom2,2,' ');
+      awejscie.FieldByName('oper').AsString:=upcase(GetLineToStr(pom2,1,' '));
+      awejscie.FieldByName('typ').AsString:=trim(upcase(GetLineToStr(pom2,3,' '))+' '+upcase(GetLineToStr(pom2,4,' ')));
+      awejscie.Post;
+    end;
+    a:=pos(#10,s);
+    delete(s,a,maxint);
+    Label2.Caption:='call '+s;
     (* pobranie konfiguracji pól - jeśli istnieją *)
     ss:=TStringList.Create;
     try

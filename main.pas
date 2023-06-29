@@ -32,6 +32,7 @@ type
 
   TForm1 = class(TForm)
     MenuItem27: TMenuItem;
+    MenuItem28: TMenuItem;
     schema: TDBSchemaSync;
     im_menu: TImageList;
     MenuItem10: TMenuItem;
@@ -86,6 +87,7 @@ type
     procedure MenuItem22Click(Sender: TObject);
     procedure MenuItem26Click(Sender: TObject);
     procedure MenuItem27Click(Sender: TObject);
+    procedure MenuItem28Click(Sender: TObject);
     procedure _EDYTOR_SQL(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
@@ -331,6 +333,7 @@ begin
   t.Caption:=nazwa+' (EXEC)';
   t.Tag:=6;
   r:=TFRamkaExec.Create(t);
+  r.io_type:=etFunction;
   r.Parent:=t;
   r.Align:=alClient;
   r.io_db:=baza_db;
@@ -339,6 +342,31 @@ begin
   TabPC.ActivePage:=t;
   r.init;
   r.load_function;
+end;
+
+procedure TForm1.MenuItem28Click(Sender: TObject);
+var
+  data: PTreeData;
+  nazwa: string;
+  t: TTabSheet;
+  r: TFRamkaExec;
+begin
+  data:=vst.GetNodeData(vst.FocusedNode);
+  nazwa:=data^.nazwa;
+  GetDB(vst.FocusedNode,baza_db,baza_trans);
+  t:=TabPC.AddTabSheet;
+  t.Caption:=nazwa+' (EXEC)';
+  t.Tag:=6;
+  r:=TFRamkaExec.Create(t);
+  r.io_type:=etProcedure;
+  r.Parent:=t;
+  r.Align:=alClient;
+  r.io_db:=baza_db;
+  r.io_trans:=baza_trans;
+  r.io_tablename:=nazwa;
+  TabPC.ActivePage:=t;
+  r.init;
+  r.load_procedure;
 end;
 
 procedure TForm1._EDYTOR_SQL(Sender: TObject);
