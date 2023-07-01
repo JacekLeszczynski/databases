@@ -150,4 +150,9 @@ object FRamkaExec: TFRamkaExec
     Left = 184
     Top = 424
   end
+  object proc: TZStoredProc
+    Params = <>
+    Left = 40
+    Top = 312
+  end
 end

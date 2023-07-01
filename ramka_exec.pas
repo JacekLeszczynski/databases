@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ExtCtrls, Spin, Buttons,
-  EditBtn, ZDataset, ZConnection, ZTransaction, ExtMessage, memds, DB;
+  EditBtn, ZDataset, ZConnection, ZStoredProcedure, ZTransaction, ExtMessage,
+  memds, DB;
 
 type
 
@@ -26,11 +27,13 @@ type
     Label5: TLabel;
     Panel1: TPanel;
     bsql: TZQuery;
+    proc: TZStoredProc;
     procedure awejscieBeforeClose(DataSet: TDataSet);
     procedure cExecClick(Sender: TObject);
   private
-    typy,cc1,cc2: TStringList;
+    typy,cc1,cc2,cc3: TStringList;
     list: TList;
+    procedure TestReadOnly(r: integer; const a: TComponent);
     procedure ShowFunction(nazwa: string; cialo: TStrings);
     procedure ShowProcedure(nazwa: string; cialo: TStrings);
     function GetParameters: string;
@@ -53,7 +56,7 @@ type
 implementation
 
 uses
-  serwis, ecode, math;
+  serwis, ecode, math, graphics;
 
 {$R *.lfm}
 
@@ -62,43 +65,104 @@ uses
 procedure TFRamkaExec.cExecClick(Sender: TObject);
 var
   s: string;
-  i: integer;
+  i,indeks: integer;
+  typ: TParamType;
 begin
-  if bsql.SQL.Count=0 then
+  if io_type=etProcedure then
   begin
-    s:='';
+    (* PROCEDURE *)
+    proc.StoredProcName:=io_tablename;
+    indeks:=0;
     for i:=0 to list.Count-1 do
     begin
-      if typy[i]='1' then continue;
-      if s='' then s:=s+':param'+IntToStr(i) else s:=s+',:param'+IntToStr(i);
+      if cc3[i]='3' then
+      begin
+        inc(indeks);
+        continue;
+      end;
+      case StrToInt(typy[i]) of
+         1: continue;
+         2: proc.Params[indeks].AsString:=TEdit(list[i]).Text;
+         3: proc.Params[indeks].AsFloat:=TFloatSpinEdit(list[i]).Value;
+         4: if TCheckBox(list[i]).Checked then proc.Params[indeks].AsInteger:=1 else proc.Params[indeks].AsInteger:=0;
+         5: proc.Params[indeks].AsLargeInt:=Int64(TFloatSpinEdit(list[i]).Value);
+         6: proc.Params[indeks].AsDate:=TDateEdit(list[i]).Date;
+         7: proc.Params[indeks].AsTime:=TTimeEdit(list[i]).Time;
+         8: proc.Params[indeks].AsLargeInt:=TSpinEdit(list[i]).Value;
+         9: proc.Params[indeks].AsString:=TComboBox(list[i]).Text;
+        10: proc.Params[indeks].AsFloat:=TCalcEdit(list[i]).AsFloat;
+        11: proc.Params[indeks].AsLargeInt:=Int64(TCalcEdit(list[i]).AsFloat);
+        12: proc.Params[indeks].AsLargeInt:=TCalcEdit(list[i]).AsInteger;
+      end;
+      inc(indeks);
     end;
-    s:='select '+io_tablename+'('+s+')';
-    bsql.SQL.Add(s);
-    bsql.Prepare;
+    proc.ExecProc;
+    indeks:=0;
+    for i:=0 to list.Count-1 do
+    begin
+      if cc3[i]='0' then continue;
+      if cc3[i]='1' then
+      begin
+        inc(indeks);
+        continue;
+      end;
+      if TComponent(list[i]).ClassName='TEdit' then TEdit(list[i]).Text:=proc.Params[indeks].AsString else
+      if TComponent(list[i]).ClassName='TSpinEdit' then TSpinEdit(list[i]).Value:=proc.Params[indeks].AsInteger else
+      if TComponent(list[i]).ClassName='TFloatSpinEdit' then TFloatSpinEdit(list[i]).Value:=proc.Params[indeks].AsFloat else
+      if TComponent(list[i]).ClassName='TCheckBox' then TCheckBox(list[i]).Checked:=proc.Params[indeks].AsInteger=1 else
+      if TComponent(list[i]).ClassName='TDateEdit' then TDateEdit(list[i]).Date:=proc.Params[indeks].AsDate else
+      if TComponent(list[i]).ClassName='TTimeEdit' then TTimeEdit(list[i]).Time:=proc.Params[indeks].AsTime else
+      if TComponent(list[i]).ClassName='TComboBox' then TComboBox(list[i]).Text:=proc.Params[indeks].AsString else
+      if TComponent(list[i]).ClassName='TCalcEdit' then TCalcEdit(list[i]).AsFloat:=proc.Params[indeks].AsFloat;
+      inc(indeks);
+    end;
+  end else begin
+    (* FUNCTION *)
+    if bsql.SQL.Count=0 then
+    begin
+      s:='';
+      for i:=0 to list.Count-1 do
+      begin
+        if typy[i]='1' then continue;
+        if s='' then s:=s+':param'+IntToStr(i) else s:=s+',:param'+IntToStr(i);
+      end;
+      s:='select '+io_tablename+'('+s+')';
+      bsql.SQL.Add(s);
+      bsql.Prepare;
+    end;
+    for i:=0 to list.Count-1 do
+    begin
+      case StrToInt(typy[i]) of
+         1: continue;
+         2: bsql.ParamByName('param'+IntToStr(i)).AsString:=TEdit(list[i]).Text;
+         3: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TFloatSpinEdit(list[i]).Value;
+         4: if TCheckBox(list[i]).Checked then bsql.ParamByName('param'+IntToStr(i)).AsInteger:=1 else bsql.ParamByName('param'+IntToStr(i)).AsInteger:=0;
+         5: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TFloatSpinEdit(list[i]).Value);
+         6: bsql.ParamByName('param'+IntToStr(i)).AsDate:=TDateEdit(list[i]).Date;
+         7: bsql.ParamByName('param'+IntToStr(i)).AsTime:=TTimeEdit(list[i]).Time;
+         8: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TSpinEdit(list[i]).Value;
+         9: bsql.ParamByName('param'+IntToStr(i)).AsString:=TComboBox(list[i]).Text;
+        10: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TCalcEdit(list[i]).AsFloat;
+        11: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TCalcEdit(list[i]).AsFloat);
+        12: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TCalcEdit(list[i]).AsInteger;
+      end;
+    end;
+    try
+      bsql.Open;
+      Label5.Caption:=bsql.Fields[0].AsString;
+      bsql.Close;
+    except
+      on E: Exception do mess.ShowError('Komunikat Błędu:^'+E.Message);
+    end;
   end;
-  for i:=0 to list.Count-1 do
+end;
+
+procedure TFRamkaExec.TestReadOnly(r: integer; const a: TComponent);
+begin
+  if r=3 then
   begin
-    case StrToInt(typy[i]) of
-       1: continue;
-       2: bsql.ParamByName('param'+IntToStr(i)).AsString:=TEdit(list[i]).Text;
-       3: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TFloatSpinEdit(list[i]).Value;
-       4: if TCheckBox(list[i]).Checked then bsql.ParamByName('param'+IntToStr(i)).AsInteger:=1 else bsql.ParamByName('param'+IntToStr(i)).AsInteger:=0;
-       5: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TFloatSpinEdit(list[i]).Value);
-       6: bsql.ParamByName('param'+IntToStr(i)).AsDate:=TDateEdit(list[i]).Date;
-       7: bsql.ParamByName('param'+IntToStr(i)).AsTime:=TTimeEdit(list[i]).Time;
-       8: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TSpinEdit(list[i]).Value;
-       9: bsql.ParamByName('param'+IntToStr(i)).AsString:=TComboBox(list[i]).Text;
-      10: bsql.ParamByName('param'+IntToStr(i)).AsFloat:=TCalcEdit(list[i]).AsFloat;
-      11: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=Int64(TCalcEdit(list[i]).AsFloat);
-      12: bsql.ParamByName('param'+IntToStr(i)).AsLargeInt:=TCalcEdit(list[i]).AsInteger;
-    end;
-  end;
-  try
-    bsql.Open;
-    Label5.Caption:=bsql.Fields[0].AsString;
-    bsql.Close;
-  except
-    on E: Exception do mess.ShowError('Komunikat Błędu:^'+E.Message);
+    TWinControl(a).Color:=clYellow;
+    TCustomEdit(a).ReadOnly:=true;
   end;
 end;
 
@@ -339,6 +403,7 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
+      cc3.Add('0');
       if s3='CALC' then s3:='';
       if s3='' then
       begin
@@ -351,11 +416,12 @@ begin
         ce.Top:=44+(n2*C_WYSOKOSC);
         ce.Caption:='';
         ce.Width:=C_DLUGOSC-10;
+        TestReadOnly(r,ce);
         list.Add(ce);
         (* LICZNIK *)
         if (n1=0) and (n2=0) then wc:=ce;
       end else begin
-        (* TEdit *)
+        (* TComboBox *)
         typy.Add('9');
         ccb:=TComboBox.Create(Panel1);
         ccb.Tag:=r;
@@ -365,10 +431,12 @@ begin
         ccb.Width:=C_DLUGOSC-10;
         ccb.Style:=csDropDownList;
         SelectToItems(s3,ccb.Items);
+        TestReadOnly(r,ccb);
         list.Add(ccb);
         (* LICZNIK *)
         if (n1=0) and (n2=0) then wc:=ccb;
       end;
+      cc3.Add(IntToStr(r));
       inc(n1);
     end else
     if pos('NUMERIC',s2)>0 then
@@ -381,6 +449,7 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
+      cc3.Add('0');
       if s3<>'CALC' then s3:='';
       if s3='' then
       begin
@@ -396,6 +465,7 @@ begin
         cf.MaxValue:=vMax;
         cf.DecimalPlaces:=vDecimalPlaces;
         cf.Width:=C_DLUGOSC-10;
+        TestReadOnly(r,cf);
         list.Add(cf);
         if (n1=0) and (n2=0) then wc:=cf;
       end else begin
@@ -408,9 +478,11 @@ begin
         calc.Top:=44+(n2*C_WYSOKOSC);
         calc.Width:=C_DLUGOSC-10;
         calc.Flat:=true;
+        TestReadOnly(r,calc);
         list.Add(calc);
         if (n1=0) and (n2=0) then wc:=calc;
       end;
+      cc3.Add(IntToStr(r));
       (* LICZNIK *)
       inc(n1);
     end else
@@ -424,6 +496,7 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
+      cc3.Add('0');
       (* TCheckBox *)
       typy.Add('4');
       cb:=TCheckBox.Create(Panel1);
@@ -434,7 +507,9 @@ begin
       cb.Caption:='';
       cb.Width:=C_DLUGOSC-10;
       cb.Checked:=false;
+      TestReadOnly(r,cb);
       list.Add(cb);
+      cc3.Add(IntToStr(r));
       (* LICZNIK *)
       if (n1=0) and (n2=0) then wc:=cb;
       inc(n1);
@@ -449,6 +524,7 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
+      cc3.Add('0');
       if s3<>'CALC' then s3:='';
       if s3='' then
       begin
@@ -464,6 +540,7 @@ begin
         cf.MaxValue:=vMax2;
         cf.DecimalPlaces:=0;
         cf.Width:=C_DLUGOSC-10;
+        TestReadOnly(r,cf);
         list.Add(cf);
         if (n1=0) and (n2=0) then wc:=cf;
       end else begin
@@ -476,9 +553,11 @@ begin
         calc.Top:=44+(n2*C_WYSOKOSC);
         calc.Width:=C_DLUGOSC-10;
         calc.Flat:=true;
+        TestReadOnly(r,calc);
         list.Add(calc);
         if (n1=0) and (n2=0) then wc:=calc;
       end;
+      cc3.Add(IntToStr(r));
       (* LICZNIK *)
       inc(n1);
     end else
@@ -492,6 +571,7 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
+      cc3.Add('0');
       if s3<>'CALC' then s3:='';
       if s3='' then
       begin
@@ -506,6 +586,7 @@ begin
         ci.MinValue:=vMin2;
         ci.MaxValue:=vMax2;
         ci.Width:=C_DLUGOSC-10;
+        TestReadOnly(r,ci);
         list.Add(ci);
         if (n1=0) and (n2=0) then wc:=ci;
       end else begin
@@ -518,9 +599,11 @@ begin
         calc.Top:=44+(n2*C_WYSOKOSC);
         calc.Width:=C_DLUGOSC-10;
         calc.Flat:=true;
+        TestReadOnly(r,calc);
         list.Add(calc);
         if (n1=0) and (n2=0) then wc:=calc;
       end;
+      cc3.Add(IntToStr(r));
       (* LICZNIK *)
       inc(n1);
     end else
@@ -534,6 +617,7 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
+      cc3.Add('0');
       (* TDateEdit *)
       typy.Add('6');
       cd:=TDateEdit.Create(Panel1);
@@ -544,7 +628,9 @@ begin
       cd.DateFormat:='yyyy-mm-dd';
       cd.Date:=date;
       cd.Width:=C_DLUGOSC-10;
+      TestReadOnly(r,cd);
       list.Add(cd);
+      cc3.Add(IntToStr(r));
       (* LICZNIK *)
       if (n1=0) and (n2=0) then wc:=cd;
       inc(n1);
@@ -559,6 +645,7 @@ begin
       cl.Top:=24+(n2*C_WYSOKOSC);
       cl.Caption:=s1+':';
       list.Add(cl);
+      cc3.Add('0');
       (* TTimeEdit *)
       typy.Add('7');
       ct:=TTimeEdit.Create(Panel1);
@@ -568,7 +655,9 @@ begin
       ct.Top:=44+(n2*C_WYSOKOSC);
       ct.Time:=time;
       ct.Width:=C_DLUGOSC-10;
+      TestReadOnly(r,ct);
       list.Add(ct);
+      cc3.Add(IntToStr(r));
       (* LICZNIK *)
       if (n1=0) and (n2=0) then wc:=ct;
       inc(n1);
@@ -614,6 +703,7 @@ begin
   list:=TList.Create;
   cc1:=TStringList.Create;
   cc2:=TStringList.Create;
+  cc3:=TStringList.Create;
 end;
 
 destructor TFRamkaExec.Destroy;
@@ -623,6 +713,7 @@ begin
   list.Free;
   cc1.Free;
   cc2.Free;
+  cc3.Free;
   inherited Destroy;
 end;
 
@@ -630,6 +721,7 @@ procedure TFRamkaExec.init;
 begin
   asql.Connection:=io_db;
   bsql.Connection:=io_db;
+  proc.Connection:=io_db;
   Label4.Visible:=io_type=etFunction;
   Label5.Visible:=Label4.Visible;
 end;
