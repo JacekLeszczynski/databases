@@ -911,6 +911,8 @@ begin
   delete(s,1,a);
   a:=pos(')',s);
   delete(s,a,maxint);
+  a:=pos('(',s);
+  if a>0 then delete(s,a,maxint);
   result:=s;
 end;
 
@@ -921,10 +923,12 @@ var
 begin
   s:=aStr;
   a:=pos('ON DELETE ',s);
-  delete(s,1,a+9);
-  b:=pos('ON',s);
-  if b=0 then b:=pos(',',s);
-  if b>1 then delete(s,b,maxint);
+  if a=0 then s:='SET DEFAULT' else begin
+    delete(s,1,a+9);
+    b:=pos('ON',s);
+    if b=0 then b:=pos(',',s);
+    if b>1 then delete(s,b,maxint);
+  end;
   result:=trim(s);
 end;
 
@@ -935,10 +939,12 @@ var
 begin
   s:=aStr;
   a:=pos('ON UPDATE ',s);
-  delete(s,1,a+9);
-  b:=pos('ON',s);
-  if b=0 then b:=pos(',',s);
-  if b>1 then delete(s,b,maxint);
+  if a=0 then s:='SET DEFAULT' else begin
+    delete(s,1,a+9);
+    b:=pos('ON',s);
+    if b=0 then b:=pos(',',s);
+    if b>1 then delete(s,b,maxint);
+  end;
   result:=trim(s);
 end;
 
@@ -1371,6 +1377,9 @@ begin
         mem5.FieldByName('keys').AsString:=GetIndexList(GetLineToStr(trim(s),5,' '));
         mem5.FieldByName('table').AsString:=GetLineToStr(trim(s),7,' ');
         mem5.FieldByName('table_keys').AsString:=GetIndexList(GetLineToStr(trim(s),8,' '));
+        //writeln('s = ',s);
+        //writeln('OnDelete = ',GetOnDelete(s));
+        //writeln('OnUpdate = ',GetOnUpdate(s));
         mem5.FieldByName('ondelete').AsString:=GetOnDelete(s);
         mem5.FieldByName('onupdate').AsString:=GetOnUpdate(s);
         mem5.Post;
